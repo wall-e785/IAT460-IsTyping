@@ -10,4 +10,4 @@ class Button:
     
     def checkMousePress(self, mouseX, mouseY):
         if mouseX > self.xPos and mouseX < self.xPos + self.width and mouseY > self.yPos and mouseY < self.yPos + self.height:
-            print("clicked")
+            return True
