@@ -1,42 +1,105 @@
 #code setup referenced from: https://www.pythonguis.com/tutorials/pyqt6-creating-your-first-window/
 #https://realpython.com/arduino-python/
-import sys
-import pyfirmata
+from pyfirmata2 import Arduino
 import time
+import pygame
 
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
+# import pygame.locals for easier 
+# access to key coordinates
+from pygame.locals import *
+ 
 
+#  analog_value = analog_input.read()
 
-# Subclass QMainWindow to customize your application's main window
-class MainWindow(QMainWindow):
+board = Arduino.AUTODETECT
+
+class AnalogPrinter:
+
     def __init__(self):
-        super().__init__()
+        # sampling rate: 10Hz
+        self.samplingRate = 10
+        self.timestamp = 0
+        self.board = board
 
-        self.setWindowTitle("is_typing")
-        button = QPushButton("Press Me!")
+    def start(self):
+        self.board.analog[0].register_callback(self.myPrintCallback)
+        self.board.samplingOn(1000 / self.samplingRate)
+        self.board.analog[0].enable_reporting()
 
-        #does not allow user to resize screen
-        self.setFixedSize(QSize(400, 300))
+    def myPrintCallback(self, data):
+        print("%f,%f" % (self.timestamp, data))
+        self.timestamp += (1 / self.samplingRate)
 
-        # Set the central widget of the Window.
-        analog_value = analog_input.read()
-        button.text = analog_value
-        self.setCentralWidget(button)
-        button.clicked.connect(self.the_button_was_clicked)
+    def stop(self):
+        self.board.exit()
 
-    
-    def the_button_was_clicked (self):
-        print("Clicked!")
+print("Let's print data from Arduino's analogue pins for 10secs.")
 
-board = pyfirmata.Arduino('COM3')
-it = pyfirmata.util.Iterator(board)
-it.start()
+# Let's create an instance
+analogPrinter = AnalogPrinter()
 
-analog_input = board.get_pin('a:0:i')
+# and start DAQ
+analogPrinter.start()
 
-app = QApplication(sys.argv)
+# let's acquire data for 10secs. We could do something else but we just sleep!
+time.sleep(10)
 
-window = MainWindow()
-window.show()
-app.exec()
+# let's stop it
+analogPrinter.stop()
+
+# Define our square object and call super to
+# give it all the properties and methods of pygame.sprite.Sprite
+# Define the class for our square objects
+class Square(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Square, self).__init__()
+         
+        # Define the dimension of the surface
+        # Here we are making squares of side 25px
+        self.surf = pygame.Surface((25, 25))
+         
+        # Define the color of the surface using RGB color coding.
+        self.surf.fill((0, 200, 255))
+        self.rect = self.surf.get_rect()
+ 
+# initialize pygame
+pygame.init()
+ 
+# Define the dimensions of screen object
+screen = pygame.display.set_mode((800, 600))
+ 
+# instantiate all square objects
+square1 = Square()
+square2 = Square()
+square3 = Square()
+square4 = Square()
+ 
+# Variable to keep our game loop running
+gameOn = True
+ 
+# Our game loop
+while gameOn:
+    # for loop through the event queue
+    for event in pygame.event.get():
+         
+        # Check for KEYDOWN event
+        if event.type == KEYDOWN:
+             
+            # If the Backspace key has been pressed set
+            # running to false to exit the main loop
+            if event.key == K_BACKSPACE:
+                gameOn = False
+                 
+        # Check for QUIT event
+        elif event.type == QUIT:
+            gameOn = False
+ 
+    # Define where the squares will appear on the screen
+    # Use blit to draw them on the screen surface
+    screen.blit(square1.surf, (40, 40))
+    screen.blit(square2.surf, (40, 530))
+    screen.blit(square3.surf, (730, 40))
+    screen.blit(square4.surf, (730, 530))
+ 
+    # Update the display using flip
+    pygame.display.flip()
