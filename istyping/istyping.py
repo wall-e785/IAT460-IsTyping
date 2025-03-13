@@ -2,6 +2,11 @@ import pygame #used this video to review pygame basics: https://www.youtube.com/
 
 #referenced this link to import my own classes: https://csatlas.com/python-import-file-module/
 #import UI.GUI as GUI
+import GrammarSets.grammarprocessing as grammar
+import GrammarSets.friend as friend
+
+import arduniohandler as Arduino
+import time
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
 class Button:
@@ -36,12 +41,6 @@ class Button:
     def draw(self):
          pygame.draw.rect(screen, self.color, self.visual, 0, 10)     
 
-
-starting_grammar = {
-    'S': [['I', 'to', 'is-typing']],
-    'I': ['Hello', 'Hey', 'Welcome', 'Hi'],
-}
-
 #initialize/setup pygame
 pygame.init()
 pygame.display.set_caption("is-typing")
@@ -71,6 +70,28 @@ selected = -1
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+
+print("Generated sentences:\n")
+for i in range(5):
+    sent = grammar.generate('S', friend.friend_grammar1)
+    print(grammar.format_sentence(sent))
+
+
+# Let's create an instance
+analogPrinter = Arduino.AnalogPrinter()
+
+# and start DAQ
+analogPrinter.start()
+
+# let's acquire data for 10secs. We could do something else but we just sleep!
+time.sleep(10)
+
+# let's stop it
+analogPrinter.stop()
+
+print("finished")
 
 class HomeScreen:
     def __init__(self):

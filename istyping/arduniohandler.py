@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from pyfirmata2 import Arduino
-import time
 
 PORT = Arduino("/dev/cu.usbserial-D309S67T")
 # PORT = '/dev/ttyACM0'
@@ -36,17 +35,3 @@ class AnalogPrinter:
         self.board.exit()
 
 print("Let's print data from Arduino's analogue pins for 10secs.")
-
-# Let's create an instance
-analogPrinter = AnalogPrinter()
-
-# and start DAQ
-analogPrinter.start()
-
-# let's acquire data for 10secs. We could do something else but we just sleep!
-time.sleep(10)
-
-# let's stop it
-analogPrinter.stop()
-
-print("finished")
