@@ -29,5 +29,5 @@ class Button:
         if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.width/2 and mouseY < self.yPos + self.height/2:
             return True
         
-    def draw(self):
-         pygame.draw.rect(screen, startButton.color, startButton.visual, 0, 10)     
+    def draw(self, wind):
+         pygame.draw.rect(wind, self.color, self.visual, 0, 10)     

@@ -7,7 +7,7 @@ friend_grammar1 = {
     'GREET': ['hi', 'hello', 'hey'],
     'ASK': ['what\'s up', 'how are you', 'what are you doing'],
     'FRIEND': ['friend', 'fren', 'bestie']
-    }
+}
 
 you_grammar1 = {
     #non-terminal symbols
@@ -22,3 +22,4 @@ you_grammar1 = {
     'ASK': ['what\'s up', 'how are you', 'what are you doing'],
     'FRIEND': ['friend', 'fren', 'bestie']
 }
+

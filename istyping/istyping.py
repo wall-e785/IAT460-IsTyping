@@ -5,8 +5,24 @@ import pygame #used this video to review pygame basics: https://www.youtube.com/
 import GrammarSets.grammarprocessing as grammar
 import GrammarSets.friend as friend
 
-import arduniohandler as Arduino
-import time
+import google.generativeai as genai
+
+#import arduniohandler as Arduino
+#import time
+
+def get_api_key(service):
+    """Get API key from various sources in order of security preference"""
+    if service.lower() == "gemini":
+        key = "dsfsdf"
+
+        if key and key != "your_gemini_api_key_here":
+            return key
+            
+        # No key found
+        raise ValueError(f"No API key found for {service}. Please set up your API key using one of the methods in the notebook.")
+    else:
+        raise ValueError(f"Unsupported service: {service}")
+
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
 class Button:
@@ -53,7 +69,7 @@ h2 = pygame.font.Font(font_path, 16)
 MAIN = 0
 FRIEND = 1
 
-state = FRIEND
+state = MAIN
 run = True
 
 optionNeg = "Bad!"
@@ -64,12 +80,18 @@ NEGATIVE = 0
 NEUTRAL = 1
 POSITIVE = 2
 
+message_counter = 0
 selected = -1
 
 #setup the window
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((1920,1080))
+resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+window.blit(resized_screen, (0,0))
+
 
 
 
@@ -79,24 +101,25 @@ for i in range(5):
     print(grammar.format_sentence(sent))
 
 
-# Let's create an instance
-analogPrinter = Arduino.AnalogPrinter()
+# # Let's create an instance
+# analogPrinter = Arduino.AnalogPrinter()
 
-# and start DAQ
-analogPrinter.start()
+# # and start DAQ
+# analogPrinter.start()
 
-# let's acquire data for 10secs. We could do something else but we just sleep!
-time.sleep(10)
+# # let's acquire data for 10secs. We could do something else but we just sleep!
+# time.sleep(10)
 
-# let's stop it
-analogPrinter.stop()
+# # let's stop it
+# analogPrinter.stop()
 
-print("finished")
+#print("finished")
 
 class HomeScreen:
     def __init__(self):
         self.startButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.aboutButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75, pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75), (200,200,200), h1.render('About', False, (0,0,0)))
+        self.bg = pygame.image.load("istyping/images/testbg.jpg")
           
 class FriendScreen:
     def __init__(self):
@@ -109,16 +132,17 @@ class FriendScreen:
 
 
 #setup current screen
-currScreen = FriendScreen()
+currScreen = HomeScreen()
 
 def mainLoop():
-    screen.fill((255,255,255))
-
     global currScreen
     global state
 
+    screen.blit(currScreen.bg.convert(), (0,0))
+
     startButton = currScreen.startButton
     aboutButton = currScreen.aboutButton
+
 
     # pygame.draw.rect(screen, startButton.color, startButton.visual, 0, 10)     
     # pygame.draw.rect(screen, aboutButton.color, aboutButton.visual, 0, 10)   
@@ -127,6 +151,7 @@ def mainLoop():
 
     screen.blit(startButton.text, (startButton.xPos-startButton.width/4, startButton.yPos-startButton.height/4))
 
+    pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
