@@ -73,13 +73,16 @@ h3 = pygame.font.Font(font_path, 10)
 
 MAIN = 0
 FRIEND = 1
+DATE = 2
+BOSS = 3
+END = 4
 
 state = MAIN
 run = True
 
-optionNeg = "Bad!"
-optionNeu = "Meh!"
-optionPos = "Good!"
+optionHigh = "Anxious Response!"
+optionNeu = "Neutral Response!"
+optionLow = "Lowkey Response!"
 
 NEGATIVE = 0
 NEUTRAL = 1
@@ -128,20 +131,21 @@ class HomeScreen:
           
 class FriendScreen:
     def __init__(self):
-        self.test = pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75)
+        self.test = pygame.Rect(100, 100, 250, 75)
         self.name = "FRIEND"
-        self.text = h1.render(grammar.generate('S', friend.friend_grammar1), True, (0,0,0))
+        self.currMessage = grammar.generate('S', friend.friend_grammar1)
+        self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         
-        global optionPos
+        global optionHigh
         global optionNeu
-        global optionNeg
+        global optionLow
 
-        optionPos = grammar.generate('S', friend.you_grammar1)
         optionNeu = grammar.generate('S', friend.you_grammar1)
-        optionNeg = grammar.generate('S', friend.you_grammar1)
+        optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'HIGH')
+        optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'LOW')
 
 
 #setup current screen
@@ -185,7 +189,7 @@ def textScreen():
     pygame.draw.rect(screen, (0,255,0), currScreen.test)
     screen.blit(currScreen.text, currScreen.test)
 
-    global optionPos, optionNeu, optionNeg
+    global optionHigh, optionNeu, optionLow
 
     posButton = currScreen.posButton
     neuButton = currScreen.neuButton
@@ -195,10 +199,17 @@ def textScreen():
     neuButton.draw()
     negButton.draw()
 
-    screen.blit(h3.render(optionNeg, True, (0,0,0)), (negButton.xPos, negButton.yPos))
-    screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH - 100, SCREEN_HEIGHT - 150))
-    screen.blit(h3.render(optionPos, True, (0,0,0)), (SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100))
+    screen.blit(h3.render(optionLow, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 250))
+    screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
+    screen.blit(h3.render(optionHigh, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150))
 
+    currSpeaker = ""
+    if state == FRIEND:
+        currSpeaker = "friend"
+    elif state == DATE:
+        currSpeaker = "date"
+    elif state == BOSS:
+        currSpeaker = "boss"
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -219,8 +230,11 @@ def textScreen():
             
             message_counter+=1
             if(message_counter == 2):
-                currScreen.text = h1.render(grammar.generate('S', friend.friend_grammar2), True, (0,0,0))
                 optionNeu = grammar.generate('S', friend.you_grammar2)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
+                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
 
            
             
