@@ -1,0 +1,1 @@
+gemini = "AIzaSyCghOemneK-Kzgp9DbA0PAxdRR-5SFN9EQ"
