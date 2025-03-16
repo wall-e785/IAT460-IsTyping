@@ -43,13 +43,40 @@ friend_grammar2 = {
 }
 you_grammar2 = {
     #non-terminal symbols
-    'S': [['V', 'V', 'V'], ['V', 'V', 'V']],
+    'S': [['IJ', 'I', 'PLAN', 'a date', 'TIME', 'CAN', 'LET']],
 
     #terminal symbols
-    'V': ['bestest', 'favourite', 'coolest'],
-    'GREET': ['hi!', 'hello!', 'hey!'],
-    'ASK': ['what\'s up', 'how are you', 'what are you doing'],
-    'FRIEND': ['friend', 'fren', 'bestie']
+    'IJ': ['hm', 'hmm', 'well'],
+    'PLAN': ['planned, scheduled'],
+    'TIME': ['tonight', 'later'],
+    'CAN': ['can I', 'I\'ll'],
+    'LET': ['let you know', 'get back to you']
+}
+
+friend_grammar3 = {
+    #non-terminal symbols
+    'S': [['YES', 'SURE', 'been busy?']],
+
+    #terminal symbols
+    'YES': ['yea', 'yes'],
+    'SURE': ['sure', 'of course', 'okay']
+}
+
+you_grammar3 = {
+    #non-terminal symbols
+    'S': [['YES']],
+
+    #terminal symbols
+    'YES': ['yea', 'yes']
+}
+
+friend_grammar4={
+    #non-terminal symbols
+    'S': [['OK', 'LUCK', 'and let me know']],
+
+    #terminal symbols
+    'OK': ['ok', 'okay', 'sounds good'],
+    'LUCK': ['good luck', 'have fun']
 }
 
 

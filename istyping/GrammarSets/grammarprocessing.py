@@ -7,6 +7,9 @@ key = env.gemini
 genai.configure(api_key=key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
+#ensures that processing requests are only allowed by one mouse press at a time to not overwhelm the system
+processing = False
+
 #referenced from week 3 lab
 def generate(symbol, grammar):
     """
@@ -45,8 +48,8 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             Generate a variation of the provided text message that fits the following criteria:
             1. The length should be longer than the original message, with a maximum length of 15 words
             2. More professional, slightly anxious tone, that has proper usage of English grammar rules
-            3. Must retain key nouns
-            4. No emojis are permitted, only text based ones like smiley faces -> :)
+            3. Must retain key nouns, do not add additional context outside of the provided texts
+            4. No emojis or special characters are permitted, only letters and punctuation.
             5. This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
 
             Return the response as a string.
@@ -59,7 +62,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             1. Similar in length, maximum of +/- 2 word length
             2. Casual tone, with usage of common internet slang and abbreviations (ex. 'u' = 'you')
             3. Must retain key nouns
-            4. No emojis are permitted, only text based ones like smiley faces -> :)
+            4. No emojis or special characters are permitted, only letters and punctuation.
             5. This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
 
             Return the response as a string.
@@ -70,6 +73,8 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         
         
         print("API Connection Successful!")
+        global processing
+        processing = False
         return response.text
     except Exception as e:
         print(f"Error connecting to API: {e}")

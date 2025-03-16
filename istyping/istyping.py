@@ -143,10 +143,10 @@ class FriendScreen:
         global optionNeu
         global optionLow
 
+        grammar.processing = True
         optionNeu = grammar.generate('S', friend.you_grammar1)
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'HIGH')
         optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'LOW')
-
 
 #setup current screen
 currScreen = HomeScreen()
@@ -211,6 +211,27 @@ def textScreen():
     elif state == BOSS:
         currSpeaker = "boss"
 
+    def get_messages():
+        global message_counter, optionNeu, optionHigh, optionLow
+        message_counter+=1
+        grammar.processing = True
+        if(message_counter == 2):
+            optionNeu = grammar.generate('S', friend.you_grammar2)
+            optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+            optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+            currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
+            currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+        elif(message_counter == 3):
+            optionNeu = grammar.generate('S', friend.you_grammar3)
+            optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+            optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+            currScreen.currMessage = grammar.generate('S', friend.friend_grammar3)
+            currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+        elif(message_counter == 4):
+            currScreen.currMessage = grammar.generate('S', friend.friend_grammar4)
+            currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
            global run
@@ -219,24 +240,17 @@ def textScreen():
             pos = pygame.mouse.get_pos()
 
             global selected
-            global message_counter
 
             if(posButton.checkMousePress(pos[0], pos[1])):
                 selected = POSITIVE
+                get_messages()
             elif(neuButton.checkMousePress(pos[0], pos[1])):
                 selected = NEUTRAL
+                get_messages()
             elif(negButton.checkMousePress(pos[0], pos[1])):
                 selected = NEGATIVE
+                get_messages()
             
-            message_counter+=1
-            if(message_counter == 2):
-                optionNeu = grammar.generate('S', friend.you_grammar2)
-                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
-                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
-
-           
             
 
 
