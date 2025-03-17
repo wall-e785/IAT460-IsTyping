@@ -56,7 +56,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             
             Return the response as a string.
             """ 
-            response = model.generate_content(prompt_high)
+            #response = model.generate_content(prompt_high)
         elif prompt == 'LOW':
             prompt_low = "Provided Text Message: " + provided_text + """
 
@@ -71,7 +71,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             
             Return the response as a string.
             """ 
-            response = model.generate_content(prompt_low)
+            #response = model.generate_content(prompt_low)
         else:
             return "Error: Invalid Prompt Choice. Options: 'HIGH', 'LOW'"
         
@@ -79,8 +79,8 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         print("API Connection Successful!")
         global processing
         processing = False
-        return response.text
-        #return "filler"
+        #return response.text
+        return "filler"
     except Exception as e:
         print(f"Error connecting to API: {e}")
         print("\nPlease check your API key configuration and try again.")

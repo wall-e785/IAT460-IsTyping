@@ -1,3 +1,4 @@
+#handling arduino read using pyfirmata2 is referenced from the creator's (Bernd Porr) GitHub exampel here: https://github.com/berndporr/pyFirmata2
 #!/usr/bin/python3
 
 from pyfirmata2 import Arduino
@@ -21,6 +22,7 @@ class AnalogPrinter:
         self.samplingRate = 10
         self.timestamp = 0
         self.board = PORT
+        self.data = 0
 
     def start(self):
         self.board.analog[0].register_callback(self.myPrintCallback)
@@ -28,9 +30,10 @@ class AnalogPrinter:
         self.board.analog[0].enable_reporting()
 
     def myPrintCallback(self, data):
-        print("%f,%f" % (self.timestamp, data))
-        self.timestamp += (1 / self.samplingRate)
-
+        #print("%f,%f" % (self.timestamp, data))
+        #self.timestamp += (1 / self.samplingRate)
+        print(data)
+        self.data = data
     def stop(self):
         self.board.exit()
 

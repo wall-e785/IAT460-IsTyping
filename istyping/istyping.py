@@ -8,27 +8,8 @@ import GrammarSets.date as date
 import GrammarSets.boss as boss
 import GrammarSets.preferences as preferences
 
-#import arduniohandler as Arduino
+import Arduino.arduniohandler as Arduino
 #import time
-
-# import google.generativeai as genai
-# import env
-
-# key = env.gemini
-# genai.configure(api_key=key)
-
-# try:
-#     # Test a simple query
-#     model = genai.GenerativeModel('gemini-2.0-flash')
-#     response = model.generate_content("Write a haiku about artificial intelligence")
-
-#     print("API Connection Successful!")
-#     print("\nHaiku response:")
-#     print(response.text)
-# except Exception as e:
-#     print(f"Error connecting to API: {e}")
-#     print("\nPlease check your API key configuration and try again.")
-
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
 
@@ -112,19 +93,10 @@ resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
 window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 window.blit(resized_screen, (0,0))
 
-# # Let's create an instance
-# analogPrinter = Arduino.AnalogPrinter()
+# create an instance for Arduino Board
+analogPrinter = Arduino.AnalogPrinter()
 
-# # and start DAQ
-# analogPrinter.start()
-
-# # let's acquire data for 10secs. We could do something else but we just sleep!
-# time.sleep(10)
-
-# # let's stop it
-# analogPrinter.stop()
-
-#print("finished")
+analogPrinter.start()
 
 #homescreen class: holds UI for homescreen
 class HomeScreen:
@@ -261,19 +233,19 @@ def textScreen():
     negButton.draw()
 
     highIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-220, 40, 40)
-    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data < 1/3:
         pygame.draw.rect(screen, (255,0,0), highIndic)
     else:
         pygame.draw.rect(screen, (0,255,0), highIndic)
 
     neutralIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-170, 40, 40)
-    if (neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+    if (neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
         pygame.draw.rect(screen, (255,0,0), neutralIndic)
     else:
         pygame.draw.rect(screen, (0,255,0), neutralIndic)
 
     lowIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-120, 40, 40)
-    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data > (1/3)*2:
         pygame.draw.rect(screen, (255,0,0), lowIndic)
     else:
         pygame.draw.rect(screen, (0,255,0), lowIndic)
@@ -424,4 +396,5 @@ while run:
     pygame.display.update()
 
 #exits window once the run loop ends
+analogPrinter.stop()
 pygame.quit()
