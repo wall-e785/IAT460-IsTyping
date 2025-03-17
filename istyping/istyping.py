@@ -59,7 +59,7 @@ class Button:
 
     #used to check mouse clicks by comparison bounding box and cursor position
     def checkMousePress(self, mouseX, mouseY):
-        if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.width/2 and mouseY < self.yPos + self.height/2:
+        if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.height/2 and mouseY < self.yPos + self.height/2:
             return True
 
     #renders visual onto the screen
@@ -259,6 +259,24 @@ def textScreen():
     posButton.draw()
     neuButton.draw()
     negButton.draw()
+
+    highIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-220, 40, 40)
+    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+        pygame.draw.rect(screen, (255,0,0), highIndic)
+    else:
+        pygame.draw.rect(screen, (0,255,0), highIndic)
+
+    neutralIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-170, 40, 40)
+    if (neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+        pygame.draw.rect(screen, (255,0,0), neutralIndic)
+    else:
+        pygame.draw.rect(screen, (0,255,0), neutralIndic)
+
+    lowIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-120, 40, 40)
+    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])):
+        pygame.draw.rect(screen, (255,0,0), lowIndic)
+    else:
+        pygame.draw.rect(screen, (0,255,0), lowIndic)
 
     screen.blit(h3.render(optionLow, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 250))
     screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
