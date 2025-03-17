@@ -1,6 +1,3 @@
-import random
-casualness = random.randint(0, 100)
-
 friend_grammar1 = {
     #non-terminal symbols
     'S': [['GREET', 'ASK', 'FRIEND'], ['how is my', 'V', 'FRIEND']],
@@ -12,12 +9,6 @@ friend_grammar1 = {
     'FRIEND': ['friend', 'fren', 'bestie']
 }
 
-#add vocab depending on the context
-# if(casualness < 30){
-   
-# }else{
-
-# }
 you_grammar1 = {
     #non-terminal symbols
     'S': [['GOOD', 'Det', 'LOC', 'TIME']],
@@ -47,7 +38,7 @@ you_grammar2 = {
 
     #terminal symbols
     'IJ': ['hm', 'hmm', 'well'],
-    'PLAN': ['planned, scheduled'],
+    'PLAN': ['planned', 'scheduled'],
     'TIME': ['tonight', 'later'],
     'CAN': ['can I', 'I\'ll'],
     'LET': ['let you know', 'get back to you']
@@ -77,6 +68,14 @@ friend_grammar4={
     #terminal symbols
     'OK': ['ok', 'okay', 'sounds good'],
     'LUCK': ['good luck', 'have fun']
+}
+
+you_grammar4 = {
+    #non-terminal symbols
+    'S': [['THANKS']],
+
+    #terminal symbols
+    'THANKS': ['thanks', 'thank you']
 }
 
 
