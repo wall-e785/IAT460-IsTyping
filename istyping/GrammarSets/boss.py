@@ -45,3 +45,15 @@ you_grammar4 = {
     'S': [['WHAT DOES THAT MEAN NOTE WHAT?']]
     #terminal symbols
 }
+
+boss_grammar5 = {
+#non-terminal symbols
+    'S': [['It\'s fine just communicate.']]
+    #terminal symbols
+}
+
+you_grammar5 = {
+    #non-terminal symbols
+    'S': [['you\'re right, I just need to communicate']]
+    #terminal symbols
+}

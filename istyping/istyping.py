@@ -31,6 +31,8 @@ import GrammarSets.preferences as preferences
 
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
+
+#button class, creates a button which has a visual component (rectangle) and text on top of it
 class Button:
     def __init__(self, xPos, yPos, width, height, visual, color):
         self.xPos = xPos
@@ -55,11 +57,12 @@ class Button:
     def centerVisual(self):
         self.visual.center = (self.xPos, self.yPos)
 
-    
+    #used to check mouse clicks by comparison bounding box and cursor position
     def checkMousePress(self, mouseX, mouseY):
         if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.width/2 and mouseY < self.yPos + self.height/2:
             return True
-        
+
+    #renders visual onto the screen
     def draw(self):
          pygame.draw.rect(screen, self.color, self.visual, 0, 10)     
 
@@ -67,13 +70,14 @@ class Button:
 pygame.init()
 pygame.display.set_caption("is-typing")
 
+#intiliaze fonts
 pygame.font.init()
 font_path = pygame.font.match_font("verdana")
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(font_path, 16)
 h3 = pygame.font.Font(font_path, 10)
 
-
+#states for FSM
 MAIN = 0
 INTRO = 1
 FRIEND = 2
@@ -84,6 +88,10 @@ END = 5
 state = MAIN
 run = True
 
+#current speaker to give to Gemini API for context
+currSpeaker = ""
+
+#variables to keep track of which option was selected by the user
 optionHigh = "Anxious Response!"
 optionNeu = "Neutral Response!"
 optionLow = "Lowkey Response!"
@@ -104,15 +112,6 @@ resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
 window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 window.blit(resized_screen, (0,0))
 
-
-
-
-# print("Generated sentences:\n")
-# for i in range(5):
-#     sent = grammar.generate('S', friend.friend_grammar1)
-#     print(grammar.format_sentence(sent))
-
-
 # # Let's create an instance
 # analogPrinter = Arduino.AnalogPrinter()
 
@@ -127,12 +126,14 @@ window.blit(resized_screen, (0,0))
 
 #print("finished")
 
+#homescreen class: holds UI for homescreen
 class HomeScreen:
     def __init__(self):
         self.startButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.aboutButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75, pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75), (200,200,200), h1.render('About', False, (0,0,0)))
         self.bg = pygame.image.load("istyping/images/testbg.jpg")
           
+#friendscreen class: holds UI and messages for friend dialogue
 class FriendScreen:
     def __init__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
@@ -152,6 +153,7 @@ class FriendScreen:
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'HIGH')
         optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'LOW')
 
+#datescreen class: holds UI and messages for date dialogue
 class DateScreen:
     def __init__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
@@ -171,6 +173,7 @@ class DateScreen:
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'date', 'HIGH')
         optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'date', 'LOW')
 
+#bossscreen class: holds UI and messages for boss dialogue
 class BossScreen:
     def __init__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
@@ -189,22 +192,31 @@ class BossScreen:
         optionNeu = grammar.generate('S', boss.you_grammar1)
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'boss', 'HIGH')
         optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'boss', 'LOW')
-    
-#setup current screen
+
+#tutscreen class: holds UI for tutorial screen
+class TutScreen:
+    def __int__(self):
+        self.test = pygame.Rect(100, 100, 250, 75)
+
+#endscreen class: holds UI for end screen to show user's performance
+class EndScreen:
+    def __int__(self):
+        self.test = pygame.Rect(100, 100, 250, 75)
+
+
+#setup current screen, used to keep track alongside current state what is showing
 currScreen = HomeScreen()
 
+#main loop - used when on home screen
 def mainLoop():
     global currScreen
     global state
 
+    #draw background image and buttons
     screen.blit(currScreen.bg.convert(), (0,0))
 
     startButton = currScreen.startButton
-    aboutButton = currScreen.aboutButton
-
-
-    # pygame.draw.rect(screen, startButton.color, startButton.visual, 0, 10)     
-    # pygame.draw.rect(screen, aboutButton.color, aboutButton.visual, 0, 10)   
+    aboutButton = currScreen.aboutButton 
     startButton.draw()
     aboutButton.draw()
 
@@ -212,26 +224,32 @@ def mainLoop():
 
     pygame.display.flip()
 
+    #event handlers
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT: #exit the window
            global run
            run = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN: #when click is detected
             pos = pygame.mouse.get_pos()
+
+            #check if any buttons were clicked
             if(startButton.checkMousePress(pos[0], pos[1])):
                 print("start!")
                 preferences.setup()
-                state = FRIEND       
+                state = FRIEND      
+                global currSpeaker 
+                currSpeaker = "friend"
                 currScreen = FriendScreen()
-            
             elif(aboutButton.checkMousePress(pos[0], pos[1])):
                 print("about!")  
 
+#text loop - used by the friend, date and boss screens to draw the UI
 def textScreen():
     screen.fill((255,255,255))
     pygame.draw.rect(screen, (0,255,0), currScreen.test)
     screen.blit(currScreen.text, currScreen.test)
 
+    #set up the three text options and draw them
     global optionHigh, optionNeu, optionLow
 
     posButton = currScreen.posButton
@@ -245,22 +263,15 @@ def textScreen():
     screen.blit(h3.render(optionLow, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 250))
     screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
     screen.blit(h3.render(optionHigh, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150))
-
-    currSpeaker = ""
-    if state == FRIEND:
-        currSpeaker = "friend"
-    elif state == DATE:
-        currSpeaker = "date"
-    elif state == BOSS:
-        currSpeaker = "boss"
-
     screen.blit(h2.render(currSpeaker, True, (0,0,0)), (20, 20))
 
+    #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
-        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen
+        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker
         message_counter+=1
         grammar.processing = True
 
+        #generate messages depending on the current speaker, and determine the set based on the message number
         if state == FRIEND:
             if(message_counter == 2):
                 optionNeu = grammar.generate('S', friend.you_grammar2)
@@ -283,6 +294,7 @@ def textScreen():
             else:
                 message_counter = 1
                 state = DATE
+                currSpeaker = "date"
                 currScreen = DateScreen()
         elif state == DATE:
             if(message_counter == 2):
@@ -306,43 +318,73 @@ def textScreen():
             else:
                 message_counter = 1
                 state = BOSS
+                currSpeaker = "boss"
                 currScreen = BossScreen()
-
+        elif state == BOSS:
+            if(message_counter == 2):
+                optionNeu = grammar.generate('S', boss.you_grammar2)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                currScreen.currMessage = grammar.generate('S', boss.boss_grammar2)
+                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+            elif(message_counter == 3):
+                optionNeu = grammar.generate('S', boss.you_grammar3)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                currScreen.currMessage = grammar.generate('S', boss.boss_grammar3)
+                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+            elif(message_counter == 4):
+                optionNeu = grammar.generate('S', boss.you_grammar4)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                currScreen.currMessage = grammar.generate('S', boss.boss_grammar4)
+                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+            elif(message_counter == 5):
+                optionNeu = grammar.generate('S', boss.you_grammar5)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                currScreen.currMessage = grammar.generate('S', boss.boss_grammar5)
+                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
+            else:
+                message_counter = 1
+                state = END
+                currScreen = EndScreen()
+            
+    #event handlers
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT: #exit button
            global run
            run = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
             pos = pygame.mouse.get_pos()
 
             global selected
+            
+            if state == FRIEND or state == DATE:
+                if message_counter <= 4:
+                    if(posButton.checkMousePress(pos[0], pos[1])):
+                        selected = HIGH
+                        get_messages()
+                    elif(neuButton.checkMousePress(pos[0], pos[1])):
+                        selected = NEUTRAL
+                        get_messages()
+                    elif(negButton.checkMousePress(pos[0], pos[1])):
+                        selected = LOW
+                        get_messages()
+            elif state == BOSS:
+                if message_counter <= 5:
+                    if(posButton.checkMousePress(pos[0], pos[1])):
+                        selected = HIGH
+                        get_messages()
+                    elif(neuButton.checkMousePress(pos[0], pos[1])):
+                        selected = NEUTRAL
+                        get_messages()
+                    elif(negButton.checkMousePress(pos[0], pos[1])):
+                        selected = LOW
+                        get_messages()
 
-            if state == FRIEND:
-                if message_counter <= 4:
-                    if(posButton.checkMousePress(pos[0], pos[1])):
-                        selected = HIGH
-                        get_messages()
-                    elif(neuButton.checkMousePress(pos[0], pos[1])):
-                        selected = NEUTRAL
-                        get_messages()
-                    elif(negButton.checkMousePress(pos[0], pos[1])):
-                        selected = LOW
-                        get_messages()
-            elif state == DATE:
-                if message_counter <= 4:
-                    if(posButton.checkMousePress(pos[0], pos[1])):
-                        selected = HIGH
-                        get_messages()
-                    elif(neuButton.checkMousePress(pos[0], pos[1])):
-                        selected = NEUTRAL
-                        get_messages()
-                    elif(negButton.checkMousePress(pos[0], pos[1])):
-                        selected = LOW
-                        get_messages()
-        
 
 #core loop to run the program
-
 while run:
 
     #show current screen based on state
@@ -363,4 +405,5 @@ while run:
     #updates screen to display objects
     pygame.display.update()
 
+#exits window once the run loop ends
 pygame.quit()
