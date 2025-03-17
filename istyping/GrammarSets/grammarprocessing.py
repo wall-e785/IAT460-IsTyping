@@ -45,29 +45,33 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         if prompt == 'HIGH':
             prompt_high = "Provided Text Message: " + provided_text + """
 
-            Generate a variation of the provided text message that fits the following criteria:
-            1. The length should be longer than the original message, with a maximum length of 15 words
-            2. More professional, slightly anxious tone, that has proper usage of English grammar rules
-            3. Must retain key nouns, do not add additional context outside of the provided texts
-            4. No emojis or special characters are permitted, only letters and punctuation.
-            5. This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
+            This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
 
+            Generate a variation of the provided text message that fits the following criteria:
+            1. The length should be longer than the original message, but should not exceed 15 words
+            2. The tone of the message should be more professional, slightly anxious in a subtle way
+            3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
+            4. Must retain key nouns and intent of message without adding new context
+            5. No emojis or special characters are permitted, only proper English grammar
+            
             Return the response as a string.
             """ 
-            #response = model.generate_content(prompt_high)
+            response = model.generate_content(prompt_high)
         elif prompt == 'LOW':
             prompt_low = "Provided Text Message: " + provided_text + """
 
+            This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
+
             Generate a variation of the provided text message that fits the following criteria:
             1. Similar in length, maximum of +/- 2 word length
-            2. Casual tone, with usage of common internet slang and abbreviations (ex. 'u' = 'you')
-            3. Must retain key nouns
-            4. No emojis or special characters are permitted, only letters and punctuation.
-            5. This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
-
+            2. The tone of the message should be casual, laid-back, with optional usage of common internet slang and abbreviations (e.g. 'u' = 'you', 'rn' = "right now")
+            3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
+            4. Must retain key nouns and intent of message without adding new context
+            5. No emojis or special characters are permitted, only proper English grammar
+            
             Return the response as a string.
             """ 
-            #response = model.generate_content(prompt_low)
+            response = model.generate_content(prompt_low)
         else:
             return "Error: Invalid Prompt Choice. Options: 'HIGH', 'LOW'"
         
@@ -75,8 +79,8 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         print("API Connection Successful!")
         global processing
         processing = False
-        #return response.text
-        return "filler"
+        return response.text
+        #return "filler"
     except Exception as e:
         print(f"Error connecting to API: {e}")
         print("\nPlease check your API key configuration and try again.")
