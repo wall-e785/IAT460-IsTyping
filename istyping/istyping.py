@@ -102,7 +102,7 @@ analogPrinter.start()
 TIMEREVENT = pygame.USEREVENT +1
 pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
 
-COUNTDOWN = 5 
+COUNTDOWN = 2 
 #time to countdown from for choosing pressure to respond with
 arduino_countdown = COUNTDOWN
 countingdown = False
@@ -176,12 +176,12 @@ class BossScreen:
 
 #tutscreen class: holds UI for tutorial screen
 class TutScreen:
-    def __int__(self):
+    def __init__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
 
 #endscreen class: holds UI for end screen to show user's performance
 class EndScreen:
-    def __int__(self):
+    def __init__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
         self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
 
@@ -402,6 +402,10 @@ def textScreen():
                                 selected = NEUTRAL
                             elif analogPrinter.data < 1/3:
                                 selected = LOW
+                        if state == FRIEND:
+                            preferences.check_friend(selected)
+                        elif state == DATE:
+                            preferences.check_date(selected)
                         get_messages()
                     elif state == BOSS:
                         if message_counter <= 5:
@@ -411,15 +415,26 @@ def textScreen():
                                 selected = NEUTRAL
                             elif analogPrinter.data < 1/3:
                                 selected = LOW
+                            preferences.check_boss(selected)
                             get_messages()
                     print(selected)   
 
 def endScreen():
+    screen.fill((255,255,255))
+
     global currScreen, state
 
     homeButton = currScreen.homeButton
 
     homeButton.draw()
+
+    screen.blit(h2.render("Friend Casualness: " + str(preferences.friend_casualness) + "%", True, (0,0,0)), (20, 40))
+    screen.blit(h2.render("Date Eagerness: " + str(preferences.date_eagerness) + "%", True, (0,0,0)), (20, 60))
+    screen.blit(h2.render("Boss Professionalism: " + str(preferences.boss_professionalism) + "%", True, (0,0,0)), (20, 80))
+
+    screen.blit(h2.render("Friend Correct: " + str(preferences.friend_correct) + "/8", True, (0,0,0)), (400, 40))
+    screen.blit(h2.render("Date Correct: " + str(preferences.date_correct) + "/8", True, (0,0,0)), (400, 60))
+    screen.blit(h2.render("Boss Correct: " + str(preferences.boss_correct) + "/10", True, (0,0,0)), (400, 80))
     
 
     for event in pygame.event.get():
