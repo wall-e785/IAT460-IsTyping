@@ -32,9 +32,7 @@ class AnalogPrinter:
     def myPrintCallback(self, data):
         #print("%f,%f" % (self.timestamp, data))
         #self.timestamp += (1 / self.samplingRate)
-        print(data)
+        #print(data)
         self.data = data
     def stop(self):
         self.board.exit()
-
-print("Let's print data from Arduino's analogue pins for 10secs.")

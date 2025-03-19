@@ -15,6 +15,8 @@ def setup():
     date_eagerness = random.randint(0, 100)
     boss_professionalism = random.randint(0, 100)
 
+    print("friend:" + str(friend_casualness) + " date:" + str(date_eagerness) + " boss:" + str(boss_professionalism))
+
     friend_correct = 0
     date_correct = 0
     boss_correct = 0

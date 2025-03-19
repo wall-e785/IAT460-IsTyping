@@ -98,6 +98,15 @@ analogPrinter = Arduino.AnalogPrinter()
 
 analogPrinter.start()
 
+#setting up timer referenced from: https://gamedevacademy.org/pygame-timer-tutorial-complete-guide/
+TIMEREVENT = pygame.USEREVENT +1
+pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
+
+COUNTDOWN = 5 
+#time to countdown from for choosing pressure to respond with
+arduino_countdown = COUNTDOWN
+countingdown = False
+
 #homescreen class: holds UI for homescreen
 class HomeScreen:
     def __init__(self):
@@ -174,6 +183,7 @@ class TutScreen:
 class EndScreen:
     def __int__(self):
         self.test = pygame.Rect(100, 100, 250, 75)
+        self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
 
 
 #setup current screen, used to keep track alongside current state what is showing
@@ -209,7 +219,8 @@ def mainLoop():
                 print("start!")
                 preferences.setup()
                 state = FRIEND      
-                global currSpeaker 
+                global currSpeaker, countingdown 
+                countingdown = True
                 currSpeaker = "friend"
                 currScreen = FriendScreen()
             elif(aboutButton.checkMousePress(pos[0], pos[1])):
@@ -222,7 +233,7 @@ def textScreen():
     screen.blit(currScreen.text, currScreen.test)
 
     #set up the three text options and draw them
-    global optionHigh, optionNeu, optionLow
+    global optionHigh, optionNeu, optionLow, arduino_countdown
 
     posButton = currScreen.posButton
     neuButton = currScreen.neuButton
@@ -233,7 +244,7 @@ def textScreen():
     negButton.draw()
 
     highIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-220, 40, 40)
-    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data < 1/3:
+    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data > (1/3)*2:
         pygame.draw.rect(screen, (255,0,0), highIndic)
     else:
         pygame.draw.rect(screen, (0,255,0), highIndic)
@@ -245,7 +256,7 @@ def textScreen():
         pygame.draw.rect(screen, (0,255,0), neutralIndic)
 
     lowIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-120, 40, 40)
-    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data > (1/3)*2:
+    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data < 1/3:
         pygame.draw.rect(screen, (255,0,0), lowIndic)
     else:
         pygame.draw.rect(screen, (0,255,0), lowIndic)
@@ -254,11 +265,14 @@ def textScreen():
     screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
     screen.blit(h3.render(optionHigh, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150))
     screen.blit(h2.render(currSpeaker, True, (0,0,0)), (20, 20))
+    screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (20, 40))
+
 
     #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
-        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker
+        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown
         message_counter+=1
+        countingdown = True
         grammar.processing = True
 
         #generate messages depending on the current speaker, and determine the set based on the message number
@@ -286,6 +300,7 @@ def textScreen():
                 state = DATE
                 currSpeaker = "date"
                 currScreen = DateScreen()
+                pygame.time.delay(1000)
         elif state == DATE:
             if(message_counter == 2):
                 optionNeu = grammar.generate('S', date.you_grammar2)
@@ -310,6 +325,7 @@ def textScreen():
                 state = BOSS
                 currSpeaker = "boss"
                 currScreen = BossScreen()
+                pygame.time.delay(1000)
         elif state == BOSS:
             if(message_counter == 2):
                 optionNeu = grammar.generate('S', boss.you_grammar2)
@@ -354,29 +370,71 @@ def textScreen():
                 if message_counter <= 4:
                     if(posButton.checkMousePress(pos[0], pos[1])):
                         selected = HIGH
-                        get_messages()
                     elif(neuButton.checkMousePress(pos[0], pos[1])):
                         selected = NEUTRAL
-                        get_messages()
                     elif(negButton.checkMousePress(pos[0], pos[1])):
                         selected = LOW
-                        get_messages()
+                    get_messages()
             elif state == BOSS:
                 if message_counter <= 5:
                     if(posButton.checkMousePress(pos[0], pos[1])):
                         selected = HIGH
-                        get_messages()
                     elif(neuButton.checkMousePress(pos[0], pos[1])):
                         selected = NEUTRAL
-                        get_messages()
                     elif(negButton.checkMousePress(pos[0], pos[1])):
                         selected = LOW
-                        get_messages()
+                    get_messages()
+        elif event.type == TIMEREVENT:
+            global countingdown
 
+            if countingdown:
+                if arduino_countdown > 0:
+                    arduino_countdown -= 1
+                else:
+                    arduino_countdown = COUNTDOWN 
+                    countingdown = False
+
+                    if state == FRIEND or state == DATE:
+                        if message_counter <= 4:
+                            if analogPrinter.data > (1/3)*2:
+                                selected = HIGH
+                            elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+                                selected = NEUTRAL
+                            elif analogPrinter.data < 1/3:
+                                selected = LOW
+                        get_messages()
+                    elif state == BOSS:
+                        if message_counter <= 5:
+                            if analogPrinter.data > (1/3)*2:
+                                selected = HIGH
+                            elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+                                selected = NEUTRAL
+                            elif analogPrinter.data < 1/3:
+                                selected = LOW
+                            get_messages()
+                    print(selected)   
+
+def endScreen():
+    global currScreen, state
+
+    homeButton = currScreen.homeButton
+
+    homeButton.draw()
+    
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: #exit button
+            global run
+            run = False
+        elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
+            pos = pygame.mouse.get_pos()
+            if(homeButton.checkMousePress(pos[0], pos[1])):
+                state = MAIN
+                currScreen = HomeScreen()
 
 #core loop to run the program
 while run:
-
+    pygame.time.delay(100)
     #show current screen based on state
     if state == MAIN:
         mainLoop()
@@ -386,6 +444,8 @@ while run:
         textScreen()
     elif state == BOSS:
         textScreen()
+    elif state == END:
+        endScreen()
     
     #clear screen with each iteration
 
@@ -394,7 +454,7 @@ while run:
 
     #updates screen to display objects
     pygame.display.update()
-
+    
 #exits window once the run loop ends
 analogPrinter.stop()
 pygame.quit()
