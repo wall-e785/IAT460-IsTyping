@@ -53,8 +53,9 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
             4. Must retain key nouns and intent of message without adding new context
             5. No emojis or special characters are permitted, only proper English grammar
+            6. Do not surround the message in any characters, such as quotation marks
             
-            Return the response as a string.
+            Return the response on its own, as a string.
             """ 
             #response = model.generate_content(prompt_high)
         elif prompt == 'LOW':
@@ -68,8 +69,9 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
             4. Must retain key nouns and intent of message without adding new context
             5. No emojis or special characters are permitted, only proper English grammar
+            6. Do not surround the message in any characters, such as quotation marks
             
-            Return the response as a string.
+            Return the response on its own, as a string.
             """ 
             #response = model.generate_content(prompt_low)
         else:
@@ -79,7 +81,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         print("API Connection Successful!")
         global processing
         processing = False
-        #return response.text
+        #return response.text[:-1]
         return "filler"
     except Exception as e:
         print(f"Error connecting to API: {e}")

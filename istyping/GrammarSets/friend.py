@@ -55,18 +55,20 @@ friend_grammar3 = {
 
 you_grammar3 = {
     #non-terminal symbols
-    'S': [['YES']],
+    'S': [['YES', 'HAVE', 'work has been', 'BUSY', 'and dating']],
 
     #terminal symbols
-    'YES': ['yea', 'yes']
+    'YES': ['yea', 'yes'],
+    'HAVE': ['i have', 'it has been'],
+    'BUSY': ['busy', 'stressful', 'exhausting']
 }
 
 friend_grammar4={
     #non-terminal symbols
-    'S': [['OK', 'LUCK', 'and let me know']],
+    'S': [['OK', 'LUCK', 'and let me know about tonight']],
 
     #terminal symbols
-    'OK': ['ok', 'okay', 'sounds good'],
+    'OK': ['ok', 'okay', 'aw'],
     'LUCK': ['good luck', 'have fun']
 }
 
@@ -75,7 +77,7 @@ you_grammar4 = {
     'S': [['THANKS']],
 
     #terminal symbols
-    'THANKS': ['thanks', 'thank you']
+    'THANKS': ['thanks', 'thank you', 'will do']
 }
 
 

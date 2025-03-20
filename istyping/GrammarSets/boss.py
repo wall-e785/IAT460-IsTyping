@@ -1,24 +1,24 @@
 boss_grammar1 = {
     #non-terminal symbols
-    'S': [['Hello']]
+    'S': ['Hello', 'Hi', 'Greetings']
     #terminal symbols
 }
 
 you_grammar1 = {
     #non-terminal symbols
-    'S': [['Hi, name']]
+    'S': [['Hi, <name>'], ['Hi, did you need something?']]
     #terminal symbols
 }
 
 boss_grammar2 = {
     #non-terminal symbols
-    'S': [['Did you get it?']]
+    'S': [['Did you get it?'], ['Have you sent it?']]
     #terminal symbols
 }
 
 you_grammar2 = {
     #non-terminal symbols
-    'S': [['huh']]
+    'S': [['I\'m not sure I know what you\'re referring to']]
     #terminal symbols
 }
 
@@ -36,24 +36,24 @@ you_grammar3 = {
 
 boss_grammar4 = {
     #non-terminal symbols
-    'S': [['Noted.']]
+    'S': [['Okay...'], ['Noted.']]
     #terminal symbols
 }
 
 you_grammar4 = {
     #non-terminal symbols
-    'S': [['WHAT DOES THAT MEAN NOTE WHAT?']]
+    'S': [['Sorry again.']]
     #terminal symbols
 }
 
 boss_grammar5 = {
 #non-terminal symbols
-    'S': [['It\'s fine just communicate.']]
+    'S': [['It\'s fine just keep in touch.']]
     #terminal symbols
 }
 
 you_grammar5 = {
     #non-terminal symbols
-    'S': [['you\'re right, I just need to communicate']]
+    'S': [['Thanks']]
     #terminal symbols
 }

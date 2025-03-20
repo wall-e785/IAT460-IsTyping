@@ -21,7 +21,7 @@ date_grammar1 = {
 
 you_grammar2 = {
     #non-terminal symbols
-    'S': [[['I'], 'so I can', 'SCHEDULE', 'the rest of my', 'TIME']],
+    'S': [['I', 'so I can', 'SCHEDULE', 'the rest of my', 'TIME']],
     
     #terminal symbols
     'I': ['I just really need to know', 'Can you let me know now'],
@@ -40,18 +40,25 @@ date_grammar2 = {
 
 you_grammar3 = {
     #non-terminal symbols
-    'S': [['Can I get a yes/no?']]
+    'S': [['Can I get a', 'CONFIRMATION']],
+
     #terminal symbols
+    'CONFIRMATION': ['yes/no', 'confirmation now']
 }
 
 date_grammar3 = {
     #non-terminal symbols
-    'S': [['Sorry I\'m doing something right now, I\'ll get back to you']]
+    'S': [['CANT', 'I\'m', 'BUSY', 'NOW', ', I\'ll get back to you']],
+
     #terminal symbols
+    'CANT': ['sorry', 'i can\'t', 'no'],
+    'BUSY': ['doing something', 'busy', 'in a rush'],
+    'NOW': ['right now', 'atm', 'at the moment']
 }
 
 you_grammar4 = {
     #non-terminal symbols
-    'S': [['oh ok']]
+    'S': [['oh ok'], ['no problem'], ['sure']]
+
     #terminal symbols
 }

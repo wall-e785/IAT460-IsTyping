@@ -45,8 +45,44 @@ class Button:
 
     #renders visual onto the screen
     def draw(self):
-         pygame.draw.rect(screen, self.color, self.visual, 0, 10)     
+         pygame.draw.rect(screen, self.color, self.visual, 0, 10) 
 
+#referenced transition screen from https://stackoverflow.com/questions/58540537/how-to-fade-the-screen-out-and-back-in-using-pygame
+#also referenced this to learn more about alpha in pygame: https://stackoverflow.com/questions/6339057/draw-transparent-rectangles-and-polygons-in-pygame
+class Fader:
+
+    def __init__(self):
+        self.fading = None
+        self.alpha = 0
+        self.surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.surf.set_alpha(self.alpha)
+        self.surf.fill((0,0,0))
+
+    def next(self):
+        if not self.fading:
+            self.fading = 'OUT'
+            self.alpha = 0
+
+    def draw(self):
+        if self.fading == 'OUT' or self.fading == 'IN':
+            self.update()
+            print(self.alpha)
+            screen.blit(self.surf, (0,0))
+        # if self.fading:
+        #     self.veil.set_alpha(self.alpha)
+        #     screen.blit(self.veil, (0, 0))
+
+    def update(self):
+        if self.fading == 'OUT':
+            self.alpha += 17
+            if self.alpha >= 255:
+                self.fading = 'IN'
+        else:
+            self.alpha -= 17
+            if self.alpha <= 0:
+                self.fading = None  
+        self.surf.set_alpha(self.alpha)
+  
 #initialize/setup pygame
 pygame.init()
 pygame.display.set_caption("is-typing")
@@ -56,7 +92,7 @@ pygame.font.init()
 font_path = pygame.font.match_font("verdana")
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(font_path, 16)
-h3 = pygame.font.Font(font_path, 10)
+h3 = pygame.font.Font(font_path, 12)
 
 #states for FSM
 MAIN = 0
@@ -102,7 +138,7 @@ analogPrinter.start()
 TIMEREVENT = pygame.USEREVENT +1
 pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
 
-COUNTDOWN = 2 
+COUNTDOWN = 7
 #time to countdown from for choosing pressure to respond with
 arduino_countdown = COUNTDOWN
 countingdown = False
@@ -188,6 +224,7 @@ class EndScreen:
 
 #setup current screen, used to keep track alongside current state what is showing
 currScreen = HomeScreen()
+fader = Fader()
 
 #main loop - used when on home screen
 def mainLoop():
@@ -217,6 +254,7 @@ def mainLoop():
             #check if any buttons were clicked
             if(startButton.checkMousePress(pos[0], pos[1])):
                 print("start!")
+                fader.next()
                 preferences.setup()
                 state = FRIEND      
                 global currSpeaker, countingdown 
@@ -462,6 +500,7 @@ while run:
     elif state == END:
         endScreen()
     
+    fader.draw()
     #clear screen with each iteration
 
     #pygame.draw.rect(screen, (0,255,0), player)
