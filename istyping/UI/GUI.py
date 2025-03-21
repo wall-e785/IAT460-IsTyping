@@ -1,33 +1,10 @@
 import pygame
 
-#referenced this for classes: https://www.w3schools.com/python/python_classes.asp
-class Button:
-    def __init__(self, xPos, yPos, width, height, visual, color):
-        self.xPos = xPos
-        self.yPos = yPos
-        self.width = width
-        self.height = height
-        self.visual = visual
-        self.color = color
-        self.text = ""
-        self.centerVisual()
+high_indic = pygame.image.load("istyping/images/high_indic.jpg")
+neutral_indic = pygame.image.load("istyping/images/neutral_indic.jpg")
+low_indic = pygame.image.load("istyping/images/low_indic.jpg")
 
-    def __init__(self, xPos, yPos, width, height, visual, color, text):
-        self.xPos = xPos
-        self.yPos = yPos
-        self.width = width
-        self.height = height
-        self.visual = visual
-        self.color = color
-        self.text = text
-        self.centerVisual()
-
-    def centerVisual(self):
-        self.visual.center = (self.xPos, self.yPos)
-    
-    def checkMousePress(self, mouseX, mouseY):
-        if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.width/2 and mouseY < self.yPos + self.height/2:
-            return True
-        
-    def draw(self, wind):
-         pygame.draw.rect(wind, self.color, self.visual, 0, 10)     
+thinking_you = pygame.image.load("istyping/images/thinking_you.jpg")
+text_you = pygame.image.load("istyping/images/text_you.jpg")
+text_them = pygame.image.load("istyping/images/text_them.jpg")
+profile_icon = pygame.image.load("istyping/images/profile_icon.jpg")

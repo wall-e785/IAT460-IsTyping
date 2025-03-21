@@ -1,7 +1,7 @@
 import pygame #used this video to review pygame basics: https://www.youtube.com/watch?v=y9VG3Pztok8
 
 #referenced this link to import my own classes: https://csatlas.com/python-import-file-module/
-#import UI.GUI as GUI
+import UI.GUI as GUI
 import GrammarSets.grammarprocessing as grammar
 import GrammarSets.friend as friend
 import GrammarSets.date as date
@@ -12,6 +12,52 @@ import Arduino.arduniohandler as Arduino
 #import time
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
+
+#initialize/setup pygame
+pygame.init()
+pygame.display.set_caption("is-typing")
+
+#intiliaze fonts
+pygame.font.init()
+font_path = pygame.font.match_font("verdana")
+h1 = pygame.font.Font(font_path, 32)
+h2 = pygame.font.Font(font_path, 16)
+h3 = pygame.font.Font(font_path, 12)
+
+#states for FSM
+MAIN = 0
+INTRO = 1
+FRIEND = 2
+DATE = 3
+BOSS = 4
+END = 5
+
+state = MAIN
+run = True
+
+#current speaker to give to Gemini API for context
+currSpeaker = ""
+
+#variables to keep track of which option was selected by the user
+optionHigh = "Anxious Response!"
+optionNeu = "Neutral Response!"
+optionLow = "Lowkey Response!"
+
+HIGH = 0
+NEUTRAL = 1
+LOW = 2
+
+message_counter = 1
+selected = -1
+
+#setup the window
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+screen = pygame.display.set_mode((1920,1080))
+resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+window.blit(resized_screen, (0,0))
 
 #button class, creates a button which has a visual component (rectangle) and text on top of it
 class Button:
@@ -76,6 +122,13 @@ class Fader:
         if self.fading == 'OUT':
             self.alpha += 17
             if self.alpha >= 255:
+                global state, currScreen, currSpeaker, countingdown 
+                if state == MAIN:
+                    preferences.setup()
+                    state = FRIEND      
+                    countingdown = True
+                    currSpeaker = "friend"
+                    currScreen = FriendScreen()
                 self.fading = 'IN'
         else:
             self.alpha -= 17
@@ -83,52 +136,6 @@ class Fader:
                 self.fading = None  
         self.surf.set_alpha(self.alpha)
   
-#initialize/setup pygame
-pygame.init()
-pygame.display.set_caption("is-typing")
-
-#intiliaze fonts
-pygame.font.init()
-font_path = pygame.font.match_font("verdana")
-h1 = pygame.font.Font(font_path, 32)
-h2 = pygame.font.Font(font_path, 16)
-h3 = pygame.font.Font(font_path, 12)
-
-#states for FSM
-MAIN = 0
-INTRO = 1
-FRIEND = 2
-DATE = 3
-BOSS = 4
-END = 5
-
-state = MAIN
-run = True
-
-#current speaker to give to Gemini API for context
-currSpeaker = ""
-
-#variables to keep track of which option was selected by the user
-optionHigh = "Anxious Response!"
-optionNeu = "Neutral Response!"
-optionLow = "Lowkey Response!"
-
-HIGH = 0
-NEUTRAL = 1
-LOW = 2
-
-message_counter = 1
-selected = -1
-
-#setup the window
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-screen = pygame.display.set_mode((1920,1080))
-resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
-window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-window.blit(resized_screen, (0,0))
-
 # create an instance for Arduino Board
 analogPrinter = Arduino.AnalogPrinter()
 
@@ -153,14 +160,14 @@ class HomeScreen:
 #friendscreen class: holds UI and messages for friend dialogue
 class FriendScreen:
     def __init__(self):
-        self.test = pygame.Rect(100, 100, 250, 75)
         self.name = "FRIEND"
         self.currMessage = grammar.generate('S', friend.friend_grammar1)
         self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        
+        self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+
         global optionHigh
         global optionNeu
         global optionLow
@@ -173,14 +180,14 @@ class FriendScreen:
 #datescreen class: holds UI and messages for date dialogue
 class DateScreen:
     def __init__(self):
-        self.test = pygame.Rect(100, 100, 250, 75)
         self.name = "DATE"
         self.currMessage = ""
         self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        
+        self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+
         global optionHigh
         global optionNeu
         global optionLow
@@ -193,14 +200,14 @@ class DateScreen:
 #bossscreen class: holds UI and messages for boss dialogue
 class BossScreen:
     def __init__(self):
-        self.test = pygame.Rect(100, 100, 250, 75)
         self.name = "BOSS"
         self.currMessage = grammar.generate('S', boss.boss_grammar1)
         self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        
+        self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+
         global optionHigh
         global optionNeu
         global optionLow
@@ -255,53 +262,52 @@ def mainLoop():
             if(startButton.checkMousePress(pos[0], pos[1])):
                 print("start!")
                 fader.next()
-                preferences.setup()
-                state = FRIEND      
-                global currSpeaker, countingdown 
-                countingdown = True
-                currSpeaker = "friend"
-                currScreen = FriendScreen()
             elif(aboutButton.checkMousePress(pos[0], pos[1])):
                 print("about!")  
 
 #text loop - used by the friend, date and boss screens to draw the UI
 def textScreen():
     screen.fill((255,255,255))
-    pygame.draw.rect(screen, (0,255,0), currScreen.test)
-    screen.blit(currScreen.text, currScreen.test)
+    screen.blit(currScreen.bg.convert(), (0,0))
+
+    screen.blit(GUI.profile_icon.convert(), (38,216))
+    their_text = screen.blit(GUI.text_them.convert(), (155,151))
+    screen.blit(currScreen.text, their_text)
+    screen.blit(GUI.profile_icon.convert(), (1143,595))
+
 
     #set up the three text options and draw them
     global optionHigh, optionNeu, optionLow, arduino_countdown
 
-    posButton = currScreen.posButton
-    neuButton = currScreen.neuButton
-    negButton = currScreen.negButton
+    # posButton = currScreen.posButton
+    # neuButton = currScreen.neuButton
+    # negButton = currScreen.negButton
 
-    posButton.draw()
-    neuButton.draw()
-    negButton.draw()
+    # posButton.draw()
+    # neuButton.draw()
+    # negButton.draw()
+    #(posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
+    #(neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
+    # (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
 
-    highIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-220, 40, 40)
-    if (posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data > (1/3)*2:
-        pygame.draw.rect(screen, (255,0,0), highIndic)
-    else:
-        pygame.draw.rect(screen, (0,255,0), highIndic)
+    if analogPrinter.data > (1/3)*2:
+        screen.blit(GUI.high_indic.convert(), (593,313))
 
-    neutralIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-170, 40, 40)
-    if (neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
-        pygame.draw.rect(screen, (255,0,0), neutralIndic)
-    else:
-        pygame.draw.rect(screen, (0,255,0), neutralIndic)
+    if (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+        screen.blit(GUI.neutral_indic.convert(), (593,441))
 
-    lowIndic = pygame.Rect(SCREEN_WIDTH-50, SCREEN_HEIGHT-120, 40, 40)
-    if (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or analogPrinter.data < 1/3:
-        pygame.draw.rect(screen, (255,0,0), lowIndic)
-    else:
-        pygame.draw.rect(screen, (0,255,0), lowIndic)
+    if  analogPrinter.data < 1/3:
+        screen.blit(GUI.low_indic.convert(), (593,562))
+
+    screen.blit(GUI.thinking_you.convert(), (684,289))
+    screen.blit(GUI.thinking_you.convert(), (684,417))
+    screen.blit(GUI.thinking_you.convert(), (684,539))
 
     screen.blit(h3.render(optionLow, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 250))
     screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
     screen.blit(h3.render(optionHigh, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150))
+    
+
     screen.blit(h2.render(currSpeaker, True, (0,0,0)), (20, 20))
     screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (20, 40))
 
@@ -402,26 +408,26 @@ def textScreen():
         elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
             pos = pygame.mouse.get_pos()
 
-            global selected
+            # global selected
             
-            if state == FRIEND or state == DATE:
-                if message_counter <= 4:
-                    if(posButton.checkMousePress(pos[0], pos[1])):
-                        selected = HIGH
-                    elif(neuButton.checkMousePress(pos[0], pos[1])):
-                        selected = NEUTRAL
-                    elif(negButton.checkMousePress(pos[0], pos[1])):
-                        selected = LOW
-                    get_messages()
-            elif state == BOSS:
-                if message_counter <= 5:
-                    if(posButton.checkMousePress(pos[0], pos[1])):
-                        selected = HIGH
-                    elif(neuButton.checkMousePress(pos[0], pos[1])):
-                        selected = NEUTRAL
-                    elif(negButton.checkMousePress(pos[0], pos[1])):
-                        selected = LOW
-                    get_messages()
+            # if state == FRIEND or state == DATE:
+            #     if message_counter <= 4:
+            #         if(posButton.checkMousePress(pos[0], pos[1])):
+            #             selected = HIGH
+            #         elif(neuButton.checkMousePress(pos[0], pos[1])):
+            #             selected = NEUTRAL
+            #         elif(negButton.checkMousePress(pos[0], pos[1])):
+            #             selected = LOW
+            #         get_messages()
+            # elif state == BOSS:
+            #     if message_counter <= 5:
+            #         if(posButton.checkMousePress(pos[0], pos[1])):
+            #             selected = HIGH
+            #         elif(neuButton.checkMousePress(pos[0], pos[1])):
+            #             selected = NEUTRAL
+            #         elif(negButton.checkMousePress(pos[0], pos[1])):
+            #             selected = LOW
+            #         get_messages()
         elif event.type == TIMEREVENT:
             global countingdown
 
