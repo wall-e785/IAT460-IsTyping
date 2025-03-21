@@ -1,9 +1,13 @@
 #processes grammar sets with recursive generation, and also accesses Gemini API to get responses
 import random
 import google.generativeai as genai
-import env
 
-key = env.gemini
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+key = os.getenv("GEMINI_KEY")
+
 genai.configure(api_key=key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
