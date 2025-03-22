@@ -27,6 +27,7 @@ bold_italic_font_path = pygame.font.match_font("verdana", True, True)
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(bold_italic_font_path, 48)
 h3 = pygame.font.Font(font_path, 20)
+transition_font = pygame.font.Font(bold_font_path,100)
 
 #states for FSM
 MAIN = 0
@@ -35,8 +36,9 @@ FRIEND = 2
 DATE = 3
 BOSS = 4
 END = 5
+TRANSITION = 6
 
-state = MAIN
+state = TRANSITION
 run = True
 
 #current speaker to give to Gemini API for context
@@ -230,9 +232,13 @@ class EndScreen:
         self.test = pygame.Rect(100, 100, 250, 75)
         self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
 
+class TransitionScreen:
+    def __init__ (self, name):
+        self.bg = pygame.image.load("istyping/images/transition_bg.jpg")
+        self.name = name
 
 #setup current screen, used to keep track alongside current state what is showing
-currScreen = HomeScreen()
+currScreen = TransitionScreen("friend")
 fader = Fader()
 
 #main loop - used when on home screen
@@ -560,9 +566,50 @@ def endScreen():
                 state = MAIN
                 currScreen = HomeScreen()
 
+alpha = 0
+name_pos = -200
+showName = False
+done = False
+stay_on_screen = 2
+
+def transitionLoop():
+    global currScreen, alpha, showName, name_pos, done 
+    
+    #referenced transparency from: https://www.youtube.com/watch?v=8_HVdxBqJmE
+    bg = currScreen.bg.copy()
+    if alpha < 30 and not done:
+        alpha+=.5
+    else:
+        showName = True
+        alpha = 255
+    bg.set_alpha(alpha)
+    screen.blit(bg, (0,0))
+
+    if showName:
+        if name_pos < 420:
+            name_pos+=20
+        else:
+            showName = False
+            done = True   
+        screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
+
+    if stay_on_screen == 0:
+        alpha -= 10
+
+    pygame.display.flip()
+
+    #event handlers
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: #exit the window
+            global run
+            run = False 
+        elif event.type == TIMEREVENT:
+            if done and stay_on_screen > 0:
+                stay_on_screen - 1
+
 #core loop to run the program
 while run:
-    pygame.time.delay(100)
+    pygame.time.delay(10)
     #show current screen based on state
     if state == MAIN:
         mainLoop()
@@ -574,6 +621,8 @@ while run:
         textScreen()
     elif state == END:
         endScreen()
+    elif state == TRANSITION:
+        transitionLoop()
     
     fader.draw()
     #clear screen with each iteration
