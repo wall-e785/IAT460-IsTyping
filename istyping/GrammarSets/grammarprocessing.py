@@ -52,7 +52,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
 
             Generate a variation of the provided text message that fits the following criteria:
-            1. The length should be longer than the original message, but should not exceed 15 words
+            1. The length should be longer than the original message, but should not exceed 102 characters
             2. The tone of the message should be more professional, slightly anxious in a subtle way
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
             4. Must retain key nouns and intent of message without adding new context
@@ -68,7 +68,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
 
             Generate a variation of the provided text message that fits the following criteria:
-            1. Similar in length, maximum of +/- 2 word length
+            1. The length should be similar to the provided text message, and cannot exceed 102 characters
             2. The tone of the message should be casual, laid-back, with optional usage of common internet slang and abbreviations (e.g. 'u' = 'you', 'rn' = "right now")
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
             4. Must retain key nouns and intent of message without adding new context

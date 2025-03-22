@@ -9,6 +9,7 @@ import GrammarSets.boss as boss
 import GrammarSets.preferences as preferences
 
 import Arduino.arduniohandler as Arduino
+import math
 #import time
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
@@ -20,9 +21,12 @@ pygame.display.set_caption("is-typing")
 #intiliaze fonts
 pygame.font.init()
 font_path = pygame.font.match_font("verdana")
+bold_font_path = pygame.font.match_font("verdana", True)
+italic_font_path = pygame.font.match_font("verdana", False, True)
+bold_italic_font_path = pygame.font.match_font("verdana", True, True)
 h1 = pygame.font.Font(font_path, 32)
-h2 = pygame.font.Font(font_path, 16)
-h3 = pygame.font.Font(font_path, 12)
+h2 = pygame.font.Font(bold_italic_font_path, 48)
+h3 = pygame.font.Font(font_path, 20)
 
 #states for FSM
 MAIN = 0
@@ -42,6 +46,7 @@ currSpeaker = ""
 optionHigh = "Anxious Response!"
 optionNeu = "Neutral Response!"
 optionLow = "Lowkey Response!"
+MAX_TEXT_LENGTH = 35
 
 HIGH = 0
 NEUTRAL = 1
@@ -145,7 +150,7 @@ analogPrinter.start()
 TIMEREVENT = pygame.USEREVENT +1
 pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
 
-COUNTDOWN = 7
+COUNTDOWN = 9
 #time to countdown from for choosing pressure to respond with
 arduino_countdown = COUNTDOWN
 countingdown = False
@@ -162,7 +167,6 @@ class FriendScreen:
     def __init__(self):
         self.name = "FRIEND"
         self.currMessage = grammar.generate('S', friend.friend_grammar1)
-        self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
@@ -182,7 +186,6 @@ class DateScreen:
     def __init__(self):
         self.name = "DATE"
         self.currMessage = ""
-        self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
@@ -202,7 +205,6 @@ class BossScreen:
     def __init__(self):
         self.name = "BOSS"
         self.currMessage = grammar.generate('S', boss.boss_grammar1)
-        self.text = h1.render(self.currMessage, True, (0,0,0))
         self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
@@ -271,8 +273,7 @@ def textScreen():
     screen.blit(currScreen.bg.convert(), (0,0))
 
     screen.blit(GUI.profile_icon.convert(), (38,216))
-    their_text = screen.blit(GUI.text_them.convert(), (155,151))
-    screen.blit(currScreen.text, their_text)
+    screen.blit(GUI.text_them.convert(), (155,151))
     screen.blit(GUI.profile_icon.convert(), (1143,595))
 
 
@@ -303,13 +304,91 @@ def textScreen():
     screen.blit(GUI.thinking_you.convert(), (684,417))
     screen.blit(GUI.thinking_you.convert(), (684,539))
 
-    screen.blit(h3.render(optionLow, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 250))
-    screen.blit(h3.render(optionNeu, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 200))
-    screen.blit(h3.render(optionHigh, True, (0,0,0)), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150))
-    
+    #y-positions of the start of the text box depending on how many lines there are
+    HIGH_3LINES_Y = 309
+    HIGH_2LINES_Y = 320
+    HIGH_1LINE_Y = 333
 
-    screen.blit(h2.render(currSpeaker, True, (0,0,0)), (20, 20))
-    screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (20, 40))
+    NEU_3LINES_Y = 439
+    NEU_2LINES_Y = 450
+    NEU_1LINE_Y = 463
+
+    LOW_3LINES_Y = 559
+    LOW_2LINES_Y = 570
+    LOW_1LINE_Y = 583
+
+    THEM_3LINES_Y = 170
+    THEM_2LINES_Y = 181
+    THEM_1LINE_Y = 194
+
+    high_num_lines = None
+    neu_num_lines = None
+    low_num_lines = None
+    them_num_lines = None
+
+    #for each of the options, check which line length they exceed, then trim and position them accordingly depending on how much space they take up
+    if len(optionHigh) > MAX_TEXT_LENGTH*2: #3 lines
+        high_num_lines = HIGH_3LINES_Y
+        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, high_num_lines+24))
+        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, high_num_lines+48))
+        
+    elif len(optionHigh) > MAX_TEXT_LENGTH: #2 lines
+        high_num_lines = HIGH_2LINES_Y
+        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, high_num_lines+24))
+    else: #1 line
+        high_num_lines = HIGH_1LINE_Y 
+        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
+
+    if len(optionNeu) > MAX_TEXT_LENGTH*2: #3 lines
+        neu_num_lines = NEU_3LINES_Y
+        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, neu_num_lines+24))
+        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, neu_num_lines+48))
+    elif len(optionNeu) > MAX_TEXT_LENGTH: #2 lines
+        neu_num_lines = NEU_2LINES_Y
+        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, neu_num_lines+24))
+    else: #1 line
+        neu_num_lines = NEU_1LINE_Y
+        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
+
+    if len(optionLow) > MAX_TEXT_LENGTH*2: #3 lines
+        low_num_lines = LOW_3LINES_Y
+        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, low_num_lines+24))
+        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, low_num_lines+48))
+    elif len(optionLow) > MAX_TEXT_LENGTH: #2 lines
+        low_num_lines = LOW_2LINES_Y
+        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, low_num_lines+24))
+    else: #1 line
+        low_num_lines = LOW_1LINE_Y
+        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
+
+    if len(currScreen.currMessage) > MAX_TEXT_LENGTH*2: #3 lines
+        them_num_lines = THEM_3LINES_Y
+        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
+        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (215, them_num_lines+48))
+    elif len(currScreen.currMessage) > MAX_TEXT_LENGTH: #2 lines
+        them_num_lines = THEM_2LINES_Y
+        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
+    else: #1 line
+        them_num_lines = THEM_1LINE_Y 
+        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
+
+
+    #rendering the speaker's message
+    screen.blit(h2.render("the " + currSpeaker + " is typing...", True, (0,0,0)), (377, 24))
+    screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (865, 200))
+
+    #referenced countdown arc from: https://stackoverflow.com/questions/67168804/how-to-make-a-circular-countdown-timer-in-pygame
+    percentage = (arduino_countdown*11)/100
+    end_angle = 2 * math.pi * percentage
+    pygame.draw.arc(window, (255, 0, 0), pygame.Rect(854, 200, 64, 64), 0, end_angle, 4)
 
 
     #nested method for retrieving messages from grammar sets/Gemini API
@@ -326,19 +405,16 @@ def textScreen():
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', friend.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', friend.friend_grammar3)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', friend.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', friend.friend_grammar4)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             else:
                 message_counter = 1
                 state = DATE
@@ -351,19 +427,16 @@ def textScreen():
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', date.date_grammar1)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', date.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', date.date_grammar2)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', date.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', date.date_grammar3)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             else:
                 message_counter = 1
                 state = BOSS
@@ -376,25 +449,21 @@ def textScreen():
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', boss.boss_grammar2)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', boss.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', boss.boss_grammar3)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', boss.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', boss.boss_grammar4)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             elif(message_counter == 5):
                 optionNeu = grammar.generate('S', boss.you_grammar5)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', boss.boss_grammar5)
-                currScreen.text = h1.render(currScreen.currMessage, True, (0,0,0))
             else:
                 message_counter = 1
                 state = END
