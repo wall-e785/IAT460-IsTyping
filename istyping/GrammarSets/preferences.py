@@ -30,14 +30,14 @@ def check_friend(selected):
     if selected == 1: #add one point if they chose the neutral phrase
         friend_correct += 1
     #add two points if they chose high/low responses suiting the friend's 'casualness'
-    elif (selected == 0 and friend_anxiousness <= 50) or (selected == 2 and friend_anxiousness >=50): 
+    elif (selected == 0 and friend_anxiousness >= 50) or (selected == 2 and friend_anxiousness <=50): 
         friend_correct += 2
 
 def check_date(selected):
     global date_correct
     if selected == 1:
         date_correct += 1
-    elif (selected == 0 and date_eagerness >=70) or (selected == 2 and date_eagerness <= 70):
+    elif (selected == 0 and date_eagerness >=50) or (selected == 2 and date_eagerness <= 50):
         date_correct +=2
 
 def check_boss(selected):

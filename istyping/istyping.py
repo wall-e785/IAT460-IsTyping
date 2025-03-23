@@ -152,7 +152,7 @@ analogPrinter.start()
 TIMEREVENT = pygame.USEREVENT +1
 pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
 
-COUNTDOWN = 9
+COUNTDOWN = 3 #9
 #time to countdown from for choosing pressure to respond with
 arduino_countdown = COUNTDOWN
 countingdown = False
@@ -437,17 +437,28 @@ def textScreen():
                 optionNeu = grammar.generate('S', date.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', date.date_grammar1)
+
+                if preferences.date_eagerness >= 50:
+                    currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar1)
+                else:
+                    currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar1)
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', date.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', date.date_grammar2)
+
+                if preferences.date_eagerness >= 50:
+                    currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar2)
+                else:
+                    currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar2)
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', date.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', date.date_grammar3)
+                if preferences.date_eagerness >= 50:
+                    currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar3)
+                else:
+                    currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar3)
             else:
                 message_counter = 1
                 state = BOSS
