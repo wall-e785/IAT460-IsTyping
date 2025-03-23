@@ -38,7 +38,7 @@ BOSS = 4
 END = 5
 TRANSITION = 6
 
-state = TRANSITION
+state = MAIN
 run = True
 
 #current speaker to give to Gemini API for context
@@ -169,9 +169,6 @@ class FriendScreen:
     def __init__(self):
         self.name = "FRIEND"
         self.currMessage = grammar.generate('S', friend.friend_grammar1)
-        self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
 
         global optionHigh
@@ -188,9 +185,6 @@ class DateScreen:
     def __init__(self):
         self.name = "DATE"
         self.currMessage = ""
-        self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
 
         global optionHigh
@@ -207,9 +201,6 @@ class BossScreen:
     def __init__(self):
         self.name = "BOSS"
         self.currMessage = grammar.generate('S', boss.boss_grammar1)
-        self.posButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.neuButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-150, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.negButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-100, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
 
         global optionHigh
@@ -224,13 +215,14 @@ class BossScreen:
 #tutscreen class: holds UI for tutorial screen
 class TutScreen:
     def __init__(self):
-        self.test = pygame.Rect(100, 100, 250, 75)
+        self.backButton = Button(225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Back', False, (0,0,0)))
+        self.nextButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Next', False, (0,0,0)))
+
 
 #endscreen class: holds UI for end screen to show user's performance
 class EndScreen:
     def __init__(self):
-        self.test = pygame.Rect(100, 100, 250, 75)
-        self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
+        self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
 
 class TransitionScreen:
     def __init__ (self, name):
@@ -238,7 +230,7 @@ class TransitionScreen:
         self.name = name
 
 #setup current screen, used to keep track alongside current state what is showing
-currScreen = TransitionScreen("friend")
+currScreen = HomeScreen()
 fader = Fader()
 
 #main loop - used when on home screen
@@ -269,7 +261,8 @@ def mainLoop():
             #check if any buttons were clicked
             if(startButton.checkMousePress(pos[0], pos[1])):
                 print("start!")
-                fader.next()
+                currScreen = TutScreen()
+                state = INTRO
             elif(aboutButton.checkMousePress(pos[0], pos[1])):
                 print("about!")  
 
@@ -537,7 +530,34 @@ def textScreen():
                             preferences.check_boss(selected)
                             get_messages()
                     print(selected)   
+def tutScreen():
+    screen.fill((255,255,255))
 
+    global currScreen, state
+
+    backButton = currScreen.backButton
+    nextButton = currScreen.nextButton
+
+    backButton.draw()
+    nextButton.draw()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: #exit button
+            global run
+            run = False
+        elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
+            pos = pygame.mouse.get_pos()
+            if(backButton.checkMousePress(pos[0], pos[1])):
+                state = MAIN
+                currScreen = HomeScreen()
+            elif(nextButton.checkMousePress(pos[0], pos[1])):
+                global currSpeaker, countingdown 
+                preferences.setup()
+                state = FRIEND      
+                countingdown = True
+                currSpeaker = "friend"
+                currScreen = FriendScreen()
+            
 def endScreen():
     screen.fill((255,255,255))
 
@@ -554,7 +574,7 @@ def endScreen():
     screen.blit(h2.render("Friend Correct: " + str(preferences.friend_correct) + "/8", True, (0,0,0)), (400, 40))
     screen.blit(h2.render("Date Correct: " + str(preferences.date_correct) + "/8", True, (0,0,0)), (400, 60))
     screen.blit(h2.render("Boss Correct: " + str(preferences.boss_correct) + "/10", True, (0,0,0)), (400, 80))
-    
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #exit button
@@ -613,6 +633,8 @@ while run:
     #show current screen based on state
     if state == MAIN:
         mainLoop()
+    elif state == INTRO:
+        tutScreen()
     elif state == FRIEND:
         textScreen()
     elif state == DATE:
