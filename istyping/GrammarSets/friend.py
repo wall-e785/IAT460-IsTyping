@@ -20,7 +20,7 @@ friend_grammar1 = {
 
 you_grammar1 = {
     #non-terminal symbols
-    'S': [['GOOD', 'Det', 'LOC', 'TIME'], ['Det', 'LOC', 'it\s', 'GOOD']],
+    'S': [['GOOD', 'Det', 'LOC', 'TIME'], ['Det', 'LOC', 'it\'s', 'GOOD']],
 
     #terminal symbols
     'GOOD': ['okay', 'good', 'great', 'fine'],

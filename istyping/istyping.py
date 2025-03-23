@@ -423,9 +423,9 @@ def textScreen():
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
 
                 if preferences.friend_anxiousness >= 50:
-                    currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
+                    currScreen.currMessage = grammar.generate('S-HIGH-GOOD', friend.friend_grammar4)
                 else:    
-                    currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
+                    currScreen.currMessage = grammar.generate('S-LOW-BAD', friend.friend_grammar4)
             else:
                 message_counter = 1
                 state = DATE
