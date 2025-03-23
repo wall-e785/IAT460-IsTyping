@@ -1,6 +1,15 @@
+import random
+
+event = None
+friend_responded = -1
+
+events = {'e': ['poetry reading', 'project presentation', 'art showcase']}
+event = random.choice(events['e'])
+print(event)
+
 friend_grammar1 = {
     #non-terminal symbols
-    'S': [['GREET', 'ASK', 'FRIEND'], ['how is my', 'V', 'FRIEND']],
+    'S': [['GREET', 'ASK', 'FRIEND'], ['how is my', 'V', 'FRIEND'], ['ASK']],
 
     #terminal symbols
     'V': ['bestest', 'favourite', 'coolest'],
@@ -21,55 +30,85 @@ you_grammar1 = {
 }
 
 friend_grammar2 = {
-    #non-terminal symbols
-    'S': [['IJ', 'well I', 'V', 'if you want to come to my', 'EVENT', 'TIME'], ['ADJ', 'my', 'EVENT', 'is', 'TIME', 'V', 'if you want to come']],
+    #if player chose a high response
+        #if the friend has a high anxiousness
+    'S-HIGH-GOOD': [['UNDERSTAND', 'I really want to see you at my', event, 'TIME', 'NOPRESSURE']],
+        #if the friend has a low anxiousness
+    'S-HIGH-BAD': [['PAUSE', 'my', event, 'is', 'TIME', 'WISH', 'see u there'], ['PAUSE', 'DUDE', 'u gotta come to my', event, 'TIME', 'plsss'], 'PAUSE', 'come to my', event, 'TIME', 'you', 'MISS', 'last time'],
+
+    #terminal symbols
+    'PAUSE': ['oh...', 'uhh, okay...', 'you good? anyways'],
+    'WISH': ['hope to', 'wish to'],
+    'DUDE': ['dude', 'ay'],
+    'UNDERSTAND': ['Oh, hope all is well!', 'That\'s nice!'],
+    'NOPRESSURE': ['no pressure if you can\'t', 'totally understand if you are busy', 'i really need your support'],
+    'MISS': ['missed out', 'missed', 'couldn\'t'],
+
+    #otherwise
+    'S': [['IJ', 'well I', 'V', 'if you want to come to my', event, 'TIME'], ['ADJ', '-hey btw, my', event, 'is', 'TIME', 'and', 'PEOPLE', 'will be there', 'IN']],
 
     #terminal symbols
     'IJ': ['oh', 'ah', 'i see'],
     'V': ['wanted to see', 'wanted to ask', 'wanna ask'],
     'EVENT': ['poetry reading', 'project presentation', 'art showcase'],
     'TIME': ['later', 'tonight'],
-    'ADJ': ['nice', 'cool']
+    'ADJ': ['nice', 'cool'],
+    'PEOPLE': ['a bunch of us', 'everyone', 'some of us'],
+    'IN': ['you in?', 'hbu?', 'wanna come?']
 
 }
 you_grammar2 = {
     #non-terminal symbols
-    'S': [['IJ', 'I', 'PLAN', 'a date', 'TIME', 'CAN', 'LET']],
+    'S': [['IJ', 'I', 'PLAN', 'a date', 'TIME', 'CAN', 'LET'], ['I\'m', 'UNSURE', 'about later yet', 'I', 'PLAN', 'a date']],
 
     #terminal symbols
     'IJ': ['hm', 'hmm', 'well'],
     'PLAN': ['planned', 'scheduled'],
     'TIME': ['tonight', 'later'],
     'CAN': ['can I', 'I\'ll'],
-    'LET': ['let you know', 'get back to you']
+    'LET': ['let you know', 'get back to you'],
+    'UNSURE': ['not sure', 'not set', 'not 100%']
 }
 
 friend_grammar3 = {
     #non-terminal symbols
-    'S': [['YES', 'SURE', 'been busy?']],
+    'S': [['OK', 'LMK', 'been', 'BUSY'], ['BUSY', 'just', 'LMK']],
 
     #terminal symbols
-    'YES': ['yea', 'yes'],
-    'SURE': ['sure', 'of course', 'okay']
+    'YES': ['kk', 'okay', 'ok'],
+    'LMK': ['lmk', 'let me know', 'tell me ASAP'],
+    'BUSY': ['busy lately?', 'working hard lately?', 'stressed lately?']
 }
 
 you_grammar3 = {
     #non-terminal symbols
-    'S': [['YES', 'HAVE', 'work has been', 'BUSY', 'and dating']],
+    'S': [['YES', 'HAVE', 'work has been', 'BUSY', 'and dating', 'BAD'], ['GROAN', 'dating', 'BAD', 'and work has been', 'BUSY']],
 
     #terminal symbols
     'YES': ['yea', 'yes'],
     'HAVE': ['i have', 'it has been'],
-    'BUSY': ['busy', 'stressful', 'exhausting']
+    'BUSY': ['busy', 'stressful', 'exhausting'],
+    'BAD': ['kinda sucks', 'isn\'t fun', 'is difficult'],
+    'GROAN': ['ugh', 'awful', 'terrible']
+
 }
 
 friend_grammar4={
     #non-terminal symbols
-    'S': [['OK', 'LUCK', 'and let me know about tonight']],
+    #if the friend has a high anxiousness
+    'S-HIGH': [['OK', 'LUCK', 'REMIND'], ['You\'ll', 'FINE', 'REMIND']],
+
+    #if the friend has a low anxiousness
+    'S-LOW': [['NOPROB', 'FRIEND', 'u\'ll', 'FINE', 'dw ttyl'], ['REMIND_LOW', 'u\'ll', 'FINE', 'ttyl']],
 
     #terminal symbols
     'OK': ['ok', 'okay', 'aw'],
-    'LUCK': ['good luck', 'have fun']
+    'LUCK': ['good luck', 'have fun'],
+    'FINE': ['be fine', 'do great', 'be okay'],
+    'REMIND': ['don\'t forget to text!', 'last reminder to text later!', 'remember to confirm!'],
+    'NOPROB': ['np', 'nw'],
+    'FRIEND': ['dude', 'fren', 'bestie'],
+    'REMIND_LOW': ['better not forget to text', 'don\'t ghost me later']
 }
 
 you_grammar4 = {

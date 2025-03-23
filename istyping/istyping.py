@@ -331,7 +331,6 @@ def textScreen():
         screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
         screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, high_num_lines+24))
         screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, high_num_lines+48))
-        
     elif len(optionHigh) > MAX_TEXT_LENGTH: #2 lines
         high_num_lines = HIGH_2LINES_Y
         screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
@@ -387,7 +386,7 @@ def textScreen():
     #referenced countdown arc from: https://stackoverflow.com/questions/67168804/how-to-make-a-circular-countdown-timer-in-pygame
     percentage = (arduino_countdown*11)/100
     end_angle = 2 * math.pi * percentage
-    pygame.draw.arc(window, (255, 0, 0), pygame.Rect(854, 200, 64, 64), 0, end_angle, 4)
+    pygame.draw.arc(window, (100, 100, 100), pygame.Rect(854, 200, 64, 64), 0, end_angle, 4)
 
 
     #nested method for retrieving messages from grammar sets/Gemini API
@@ -403,17 +402,30 @@ def textScreen():
                 optionNeu = grammar.generate('S', friend.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
+
+                if selected == HIGH:
+                    if preferences.friend_anxiousness>=50:
+                        currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar2)
+                    else:
+                        currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar2)
+                else:
+                    currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', friend.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 currScreen.currMessage = grammar.generate('S', friend.friend_grammar3)
+
+                friend.friend_responded = selected
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', friend.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', friend.friend_grammar4)
+
+                if preferences.friend_anxiousness >= 50:
+                    currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
+                else:    
+                    currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
             else:
                 message_counter = 1
                 state = DATE
@@ -567,7 +579,7 @@ def endScreen():
 
     homeButton.draw()
 
-    screen.blit(h2.render("Friend Casualness: " + str(preferences.friend_casualness) + "%", True, (0,0,0)), (20, 40))
+    screen.blit(h2.render("Friend Casualness: " + str(preferences.friend_anxiousness) + "%", True, (0,0,0)), (20, 40))
     screen.blit(h2.render("Date Eagerness: " + str(preferences.date_eagerness) + "%", True, (0,0,0)), (20, 60))
     screen.blit(h2.render("Boss Professionalism: " + str(preferences.boss_professionalism) + "%", True, (0,0,0)), (20, 80))
 
