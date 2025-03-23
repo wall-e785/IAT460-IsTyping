@@ -9,9 +9,6 @@ friend_correct = 0
 date_correct = 0
 boss_correct = 0
 
-date_responded = -1
-boss_responded = -1
-
 def setup():
     global friend_anxiousness, date_eagerness, boss_professionalism, friend_correct, date_correct, boss_correct, event
     friend_anxiousness = random.randint(0, 100)
@@ -44,3 +41,5 @@ def check_boss(selected):
     global boss_correct
     if selected == 1:
         boss_correct +=1
+    elif (selected == 0 and boss_professionalism >=50) or (selected == 2 and boss_professionalism <= 50):
+        boss_correct +=2

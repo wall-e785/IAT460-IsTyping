@@ -37,6 +37,7 @@ DATE = 3
 BOSS = 4
 END = 5
 TRANSITION = 6
+FRIEND_END = 7
 
 state = MAIN
 run = True
@@ -200,7 +201,12 @@ class DateScreen:
 class BossScreen:
     def __init__(self):
         self.name = "BOSS"
-        self.currMessage = grammar.generate('S', boss.boss_grammar1)
+        self.currMessage = None
+
+        if preferences.boss_professionalism >=50:
+            self.currMessage = grammar.generate('S-PROF', boss.boss_grammar1)
+        else:
+            self.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar1)
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
 
         global optionHigh
@@ -470,22 +476,45 @@ def textScreen():
                 optionNeu = grammar.generate('S', boss.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', boss.boss_grammar2)
+                if preferences.boss_professionalism >=50:
+                    currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar2)
+                else:
+                    currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar2)
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', boss.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', boss.boss_grammar3)
+                if preferences.boss_professionalism >=50:
+                    currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar3)
+                else:
+                    currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar3)            
             elif(message_counter == 4):
+                boss.responded = selected
                 optionNeu = grammar.generate('S', boss.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', boss.boss_grammar4)
+                if preferences.boss_professionalism >=50:
+                    currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar4)
+                else:
+                    currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar4)
             elif(message_counter == 5):
-                optionNeu = grammar.generate('S', boss.you_grammar5)
+                if boss.responded <=1:
+                    optionNeu = grammar.generate('S-CARE', boss.you_grammar5)
+                else:
+                    optionNeu = grammar.generate('S', boss.you_grammar5)
+
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', boss.boss_grammar5)
+                if preferences.boss_professionalism >=50:
+                    if boss.responded <= 1:
+                        currScreen.currMessage = grammar.generate('S-PROF-CARE', boss.boss_grammar5)
+                    else:
+                        currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar5)
+                else:
+                    if boss.responded <=1:
+                        currScreen.currMessage = grammar.generate('S-CASUAL-CARE', boss.boss_grammar5)
+                    else:
+                        currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar5)
             else:
                 message_counter = 1
                 state = END
