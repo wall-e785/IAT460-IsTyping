@@ -28,6 +28,7 @@ h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(bold_italic_font_path, 48)
 h3 = pygame.font.Font(font_path, 20)
 transition_font = pygame.font.Font(bold_font_path,100)
+name_header = pygame.font.Font(bold_font_path, 48)
 
 #states for FSM
 MAIN = 0
@@ -386,7 +387,7 @@ def textScreen():
 
 
     #rendering the speaker's message
-    screen.blit(h2.render("the " + currSpeaker + " is typing...", True, (0,0,0)), (377, 24))
+    screen.blit(name_header.render(currSpeaker, True, (0,0,0)), (575, 24))
     screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (865, 200))
 
     #referenced countdown arc from: https://stackoverflow.com/questions/67168804/how-to-make-a-circular-countdown-timer-in-pygame
@@ -411,9 +412,9 @@ def textScreen():
 
                 if selected == HIGH:
                     if preferences.friend_anxiousness>=50:
-                        currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar2)
+                        currScreen.currMessage = grammar.generate('S-HIGH-GOOD', friend.friend_grammar2)
                     else:
-                        currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar2)
+                        currScreen.currMessage = grammar.generate('S-LOW-BAD', friend.friend_grammar2)
                 else:
                     currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
             elif(message_counter == 3):
@@ -429,9 +430,9 @@ def textScreen():
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
 
                 if preferences.friend_anxiousness >= 50:
-                    currScreen.currMessage = grammar.generate('S-HIGH-GOOD', friend.friend_grammar4)
+                    currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
                 else:    
-                    currScreen.currMessage = grammar.generate('S-LOW-BAD', friend.friend_grammar4)
+                    currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
             else:
                 message_counter = 1
                 state = DATE
@@ -526,29 +527,6 @@ def textScreen():
         if event.type == pygame.QUIT: #exit button
            global run
            run = False
-        elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
-            pos = pygame.mouse.get_pos()
-
-            # global selected
-            
-            # if state == FRIEND or state == DATE:
-            #     if message_counter <= 4:
-            #         if(posButton.checkMousePress(pos[0], pos[1])):
-            #             selected = HIGH
-            #         elif(neuButton.checkMousePress(pos[0], pos[1])):
-            #             selected = NEUTRAL
-            #         elif(negButton.checkMousePress(pos[0], pos[1])):
-            #             selected = LOW
-            #         get_messages()
-            # elif state == BOSS:
-            #     if message_counter <= 5:
-            #         if(posButton.checkMousePress(pos[0], pos[1])):
-            #             selected = HIGH
-            #         elif(neuButton.checkMousePress(pos[0], pos[1])):
-            #             selected = NEUTRAL
-            #         elif(negButton.checkMousePress(pos[0], pos[1])):
-            #             selected = LOW
-            #         get_messages()
         elif event.type == TIMEREVENT:
             global countingdown
 

@@ -121,12 +121,14 @@ you_grammar4 = {
 
 friend_grammar5 = {
     #non-terminal symbols
-    'S-HIGH': [['HEY', 'the', event, 'is in', 'TIME'], ['still panicking? ']],
-    'S-LOW': [['still panicking? or make a choice haha']],
+    'S-HIGH': [['HEY', 'the', event, 'is in', 'TIME', 'CHECKIN'], ['HEY', 'only', 'TIME', 'until the', event, 'COMING']],
+    'S-LOW': [['still drowning in indecision? or make a choice? lol', 'TIME', 'left til my', event], ['only', 'TIME', 'left...', 'soooo, u comin to the', event]],
 
     #terminal symbols
     'HEY': ['hey!', 'ay!', 'hello!'],
-    'TIME': ['an hour', '45 minutes', 'hour and a half']
+    'TIME': ['an hour', '45 minutes', 'hour and a half'],
+    'CHECKIN': ['updates?', 'any news?'],
+    'COMING': ['hope you come!', 'thought i\'d check in!']
 }
 
 
