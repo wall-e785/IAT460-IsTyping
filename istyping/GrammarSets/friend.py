@@ -119,4 +119,14 @@ you_grammar4 = {
     'THANKS': ['thanks', 'thank you', 'will do']
 }
 
+friend_grammar5 = {
+    #non-terminal symbols
+    'S-HIGH': [['HEY', 'the', event, 'is in', 'TIME'], ['still panicking? ']],
+    'S-LOW': [['still panicking? or make a choice haha']],
+
+    #terminal symbols
+    'HEY': ['hey!', 'ay!', 'hello!'],
+    'TIME': ['an hour', '45 minutes', 'hour and a half']
+}
+
 

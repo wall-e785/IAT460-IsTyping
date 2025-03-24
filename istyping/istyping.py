@@ -481,13 +481,14 @@ def textScreen():
                 else:
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar2)
             elif(message_counter == 3):
-                optionNeu = grammar.generate('S', boss.you_grammar3)
-                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
-                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 if preferences.boss_professionalism >=50:
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar3)
+                    optionNeu = grammar.generate('S-PROF', boss.you_grammar3)
                 else:
-                    currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar3)            
+                    currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar3)      
+                    optionNeu = grammar.generate('S-CASUAL', boss.you_grammar3) 
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')     
             elif(message_counter == 4):
                 boss.responded = selected
                 optionNeu = grammar.generate('S', boss.you_grammar4)
