@@ -236,6 +236,15 @@ class TransitionScreen:
         self.bg = pygame.image.load("istyping/images/transition_bg.jpg")
         self.name = name
 
+class friendEndScreen:
+    def __init__ (self):
+        self.messageimg = pygame.image.load("istyping/images/friend_final_text.jpg")
+        self.yPos = SCREEN_HEIGHT
+        self.alpha = 0
+        if preferences.friend_anxiousness >= 50:
+            self.text = grammar.generate('S-HIGH', friend.friend_grammar5)
+        else:
+            self.text = grammar.generate('S-LOW', friend.friend_grammar5)
 #setup current screen, used to keep track alongside current state what is showing
 currScreen = HomeScreen()
 fader = Fader()
@@ -383,7 +392,6 @@ def textScreen():
         screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
     else: #1 line
         them_num_lines = THEM_1LINE_Y 
-        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
 
 
     #rendering the speaker's message
@@ -658,6 +666,45 @@ def transitionLoop():
             if done and stay_on_screen > 0:
                 stay_on_screen - 1
 
+def friendEndLoop():
+    screen.fill((255,255,255))
+
+    global currScreen
+    if currScreen.yPos > 253:
+        currScreen.yPos-=10
+    else:
+        currScreen.yPos = 253
+    
+    if currScreen.yPos < 350:
+        currScreen.alpha += 3
+
+    currScreen.messageimg.set_alpha(currScreen.alpha)
+    screen.blit(currScreen.messageimg, (265,currScreen.yPos))
+
+    START_POINT = 330
+    MAX_LENGTH = 37
+
+    if currScreen.yPos >=253 and currScreen.alpha > 25:
+        if len(currScreen.text) > MAX_LENGTH*2: #3 lines
+            screen.blit(h1.render(currScreen.text[:MAX_LENGTH], True, (0,0,0)), (490, START_POINT))
+            screen.blit(h1.render(currScreen.text[MAX_LENGTH:MAX_LENGTH*2], True, (0,0,0)), (490, START_POINT+40))
+            screen.blit(h1.render(currScreen.text[MAX_LENGTH*2:MAX_LENGTH*3], True, (0,0,0)), (490, START_POINT+80))
+        elif len(currScreen.text) > MAX_LENGTH: #2 lines
+            screen.blit(h1.render(currScreen.text[:MAX_LENGTH], True, (0,0,0)), (215, START_POINT))
+            screen.blit(h1.render(currScreen.text[MAX_LENGTH:MAX_LENGTH*2], True, (0,0,0)), (215, START_POINT+40))
+        else: #1 line
+            screen.blit(h1.render(currScreen.text, True, (0,0,0)), (215, START_POINT))
+
+
+
+
+    #event handlers
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: #exit the window
+            global run
+            run = False 
+          
+
 #core loop to run the program
 while run:
     pygame.time.delay(10)
@@ -676,6 +723,8 @@ while run:
         endScreen()
     elif state == TRANSITION:
         transitionLoop()
+    elif state == FRIEND_END:
+        friendEndLoop()
     
     fader.draw()
     #clear screen with each iteration
