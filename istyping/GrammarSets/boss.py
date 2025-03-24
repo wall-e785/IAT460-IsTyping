@@ -31,7 +31,7 @@ you_grammar2 = {
 boss_grammar3= {
     #non-terminal symbols
     'S-PROF': [['The', 'WORK', 'EMAIL', 'We need them done', 'QUICK'], ['There is an urgent', 'WORK', 'email']],
-    'S-CASUAL': [['OOPS', 'PROBLEM', ', the', 'WORK', 'chances you\'re free tonight?'], ['The', 'work', 'OOPS', 'PROBLEM']],
+    'S-CASUAL': [['OOPS', 'PROBLEM', ', the', 'WORK', 'chances you\'re free tonight?'], ['The', 'WORK', 'OOPS', 'PROBLEM']],
 
     #terminal symbols
     'WORK': ['new logo revisions', 'social media update'],
@@ -94,7 +94,7 @@ boss_grammar5 = {
 
 you_grammar5 = {
     #non-terminal symbols
-    'S-CARE': [['I\'m', 'OK', 'thanks for', 'CHECK'], ['I\'m', 'alright, just', 'BUSY']],
+    'S-CARE': [['I\'m', 'OK', 'thanks for', 'CHECKING'], ['I\'m', 'alright, just', 'BUSY']],
     'S': [['THANKS'], ['KIT']],
 
     #terminal symbols

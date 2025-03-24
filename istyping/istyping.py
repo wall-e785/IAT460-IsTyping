@@ -154,7 +154,7 @@ analogPrinter.start()
 TIMEREVENT = pygame.USEREVENT +1
 pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
 
-COUNTDOWN = 3 #9
+COUNTDOWN = 9
 #time to countdown from for choosing pressure to respond with
 arduino_countdown = COUNTDOWN
 countingdown = False
@@ -392,6 +392,7 @@ def textScreen():
         screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
     else: #1 line
         them_num_lines = THEM_1LINE_Y 
+        screen.blit(h3.render(currScreen.currMessage, True, (0,0,0)), (215, them_num_lines))
 
 
     #rendering the speaker's message
@@ -443,10 +444,8 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
             else:
                 message_counter = 1
-                state = DATE
-                currSpeaker = "date"
-                currScreen = DateScreen()
-                pygame.time.delay(1000)
+                state = TRANSITION
+                currScreen = TransitionScreen("Date")
         elif state == DATE:
             if(message_counter == 2):
                 optionNeu = grammar.generate('S', date.you_grammar2)
@@ -476,10 +475,8 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar3)
             else:
                 message_counter = 1
-                state = BOSS
-                currSpeaker = "boss"
-                currScreen = BossScreen()
-                pygame.time.delay(1000)
+                currScreen = TransitionScreen("Boss")
+                state = TRANSITION
         elif state == BOSS:
             if(message_counter == 2):
                 optionNeu = grammar.generate('S', boss.you_grammar2)
@@ -567,7 +564,7 @@ def textScreen():
                             elif analogPrinter.data < 1/3:
                                 selected = LOW
                             preferences.check_boss(selected)
-                            get_messages()
+                        get_messages()
                     print(selected)   
 def tutScreen():
     screen.fill((255,255,255))
@@ -590,12 +587,9 @@ def tutScreen():
                 state = MAIN
                 currScreen = HomeScreen()
             elif(nextButton.checkMousePress(pos[0], pos[1])):
-                global currSpeaker, countingdown 
-                preferences.setup()
-                state = FRIEND      
-                countingdown = True
-                currSpeaker = "friend"
-                currScreen = FriendScreen()
+                currScreen = TransitionScreen("Friend")
+                state = TRANSITION
+
             
 def endScreen():
     screen.fill((255,255,255))
@@ -632,12 +626,13 @@ done = False
 stay_on_screen = 2
 
 def transitionLoop():
-    global currScreen, alpha, showName, name_pos, done 
+    screen.fill((255,255,255))
+    global currScreen, alpha, showName, name_pos, done, stay_on_screen 
     
     #referenced transparency from: https://www.youtube.com/watch?v=8_HVdxBqJmE
     bg = currScreen.bg.copy()
-    if alpha < 30 and not done:
-        alpha+=.5
+    if alpha < 255 and not done:
+        alpha+=10
     else:
         showName = True
         alpha = 255
@@ -646,14 +641,35 @@ def transitionLoop():
 
     if showName:
         if name_pos < 420:
-            name_pos+=20
+            name_pos+=15
         else:
             showName = False
             done = True   
         screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
 
     if stay_on_screen == 0:
-        alpha -= 10
+        alpha = 0
+        name_pos = -200
+        showName = False
+        done = False
+        stay_on_screen =2
+        global state, currSpeaker, countingdown 
+        if currScreen.name == "Friend":
+            preferences.setup()
+            state = FRIEND      
+            countingdown = True
+            currSpeaker = "friend"
+            currScreen = FriendScreen()
+        elif currScreen.name == "Date":
+            state = DATE
+            currSpeaker = "date"
+            currScreen = DateScreen()
+            pygame.time.delay(1000)
+        elif currScreen.name == "Boss":
+            state = BOSS
+            currSpeaker = "boss"
+            currScreen = BossScreen()
+            pygame.time.delay(1000)
 
     pygame.display.flip()
 
@@ -664,7 +680,7 @@ def transitionLoop():
             run = False 
         elif event.type == TIMEREVENT:
             if done and stay_on_screen > 0:
-                stay_on_screen - 1
+                stay_on_screen -= 1
 
 def friendEndLoop():
     screen.fill((255,255,255))
@@ -695,9 +711,6 @@ def friendEndLoop():
         else: #1 line
             screen.blit(h1.render(currScreen.text, True, (0,0,0)), (215, START_POINT))
 
-
-
-
     #event handlers
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #exit the window
@@ -726,7 +739,7 @@ while run:
     elif state == FRIEND_END:
         friendEndLoop()
     
-    fader.draw()
+    #fader.draw()
     #clear screen with each iteration
 
     #pygame.draw.rect(screen, (0,255,0), player)
