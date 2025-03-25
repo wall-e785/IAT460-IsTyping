@@ -341,58 +341,72 @@ def textScreen():
     low_num_lines = None
     them_num_lines = None
 
-    #for each of the options, check which line length they exceed, then trim and position them accordingly depending on how much space they take up
-    if len(optionHigh) > MAX_TEXT_LENGTH*2: #3 lines
+    formattedHigh = grammar.format_text(optionHigh, MAX_TEXT_LENGTH)
+    formattedNeu = grammar.format_text(optionNeu, MAX_TEXT_LENGTH)
+    formattedLow = grammar.format_text(optionLow, MAX_TEXT_LENGTH)
+    formattedThem = grammar.format_text(currScreen.currMessage, MAX_TEXT_LENGTH)
+
+    #for each of the options, check how many lines they need
+    if len(formattedHigh) == 3: #3 lines
         high_num_lines = HIGH_3LINES_Y
-        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, high_num_lines+24))
-        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, high_num_lines+48))
-    elif len(optionHigh) > MAX_TEXT_LENGTH: #2 lines
+        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h3.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+        screen.blit(h3.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+48))
+    elif len(formattedHigh) == 2: #2 lines
         high_num_lines = HIGH_2LINES_Y
-        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h3.render(optionHigh[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, high_num_lines+24))
-    else: #1 line
+        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h3.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+    elif len(formattedHigh) == 1: #1 line
         high_num_lines = HIGH_1LINE_Y 
-        screen.blit(h3.render(optionHigh[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+    else:
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
-    if len(optionNeu) > MAX_TEXT_LENGTH*2: #3 lines
+    if len(formattedNeu) == 3: #3 lines
         neu_num_lines = NEU_3LINES_Y
-        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, neu_num_lines+24))
-        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, neu_num_lines+48))
-    elif len(optionNeu) > MAX_TEXT_LENGTH: #2 lines
+        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h3.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+        screen.blit(h3.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+48))
+    elif len(formattedNeu) == 2: #2 lines
         neu_num_lines = NEU_2LINES_Y
-        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h3.render(optionNeu[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, neu_num_lines+24))
-    else: #1 line
+        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h3.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+    elif len(formattedNeu) == 1: #1 line
         neu_num_lines = NEU_1LINE_Y
-        screen.blit(h3.render(optionNeu[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+    else:
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
-    if len(optionLow) > MAX_TEXT_LENGTH*2: #3 lines
+
+    if len(formattedLow) == 3: #3 lines
         low_num_lines = LOW_3LINES_Y
-        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, low_num_lines+24))
-        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (708, low_num_lines+48))
-    elif len(optionLow) > MAX_TEXT_LENGTH: #2 lines
+        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h3.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+        screen.blit(h3.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+48))
+    elif len(formattedLow) == 2: #2 lines
         low_num_lines = LOW_2LINES_Y
-        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h3.render(optionLow[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (708, low_num_lines+24))
-    else: #1 line
+        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h3.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+    elif len(formattedLow) == 1: #1 line
         low_num_lines = LOW_1LINE_Y
-        screen.blit(h3.render(optionLow[:MAX_TEXT_LENGTH], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+    else:
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
-    if len(currScreen.currMessage) > MAX_TEXT_LENGTH*2: #3 lines
+    if len(formattedThem) == 3: #3 lines
         them_num_lines = THEM_3LINES_Y
-        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
-        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
-        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH*2:MAX_TEXT_LENGTH*3], True, (0,0,0)), (215, them_num_lines+48))
-    elif len(currScreen.currMessage) > MAX_TEXT_LENGTH: #2 lines
+        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h3.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
+        screen.blit(h3.render(formattedThem[2], True, (0,0,0)), (215, them_num_lines+48))
+    elif len(formattedThem) == 2: #2 lines
         them_num_lines = THEM_2LINES_Y
-        screen.blit(h3.render(currScreen.currMessage[:MAX_TEXT_LENGTH], True, (0,0,0)), (215, them_num_lines))
-        screen.blit(h3.render(currScreen.currMessage[MAX_TEXT_LENGTH:MAX_TEXT_LENGTH*2], True, (0,0,0)), (215, them_num_lines+24))
-    else: #1 line
+        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h3.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
+    elif len(formattedThem) == 1: #1 line
         them_num_lines = THEM_1LINE_Y 
-        screen.blit(h3.render(currScreen.currMessage, True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+    else:
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
 
     #rendering the speaker's message

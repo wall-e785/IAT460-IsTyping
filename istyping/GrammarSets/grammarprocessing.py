@@ -32,12 +32,47 @@ def generate(symbol, grammar):
         return production
     return symbol
 
-#this function helps properly format the sentence by capitalizing
-def format_sentence(sentence):
-    #referenced for upper: https://stackoverflow.com/questions/17794241/how-do-i-convert-only-specific-parts-of-a-string-to-uppercase-in-python
-    return sentence[0].upper() + sentence[1:]
+#this function helps properly formats the text into rows, ready to display on a text bubble
+#pre-condition: takes in one string 
+#post-condition: returns a list of strings
+def format_text(sentence, maxLineLength):
 
-#overloaded version that also adds caps to end of punctuation
+    #keep track of lines to return, and temporary variables to hold the current word/current line
+    listoflines = []
+    tempString = ""
+    tempLine = ""
+
+    #for each character in the sentence, seperate the words (by spaces)
+    for char in sentence:
+        if char != " ":
+            tempString += char
+        else:
+            #once a space is encountered, check if the current word can be added to the current line without exceeding maxLineLength
+            if (len(tempLine)+len(tempString)+1 <= maxLineLength):
+                #add spaces as needed
+                if len(tempLine) <= 0:
+                    tempLine = tempString
+                else:
+                    tempLine = tempLine + " " + tempString
+            else:
+                #otherwise, the maximum line length has been reached, add it to the list and assign current word to the next line
+                listoflines.append(tempLine)
+                tempLine = tempString
+            #reset the string 
+            tempString = ""
+
+    #check if the last string was added to the last line
+    if len(tempString) > 0:
+        if len(tempLine) <= 0:
+            tempLine = tempString
+        else:
+            tempLine = tempLine + " " + tempString
+
+    #now check if the last line was added to the list
+    if len(tempLine) > 0:
+        listoflines.append(tempLine)
+
+    return listoflines
 
 #returns the Gemini response:
 #received_text - the text message received from the other party
