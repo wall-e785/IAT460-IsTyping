@@ -21,7 +21,7 @@ The following libaries are also required to be downloaded using pip into the vir
 
 To setup the Arduino board, you will need to upload the StandardFirmata example sketch. More information to find this sketch in Arduino can be found here, as well as the original documentation of pyfirmata2: https://github.com/berndporr/pyFirmata2
 You will also need wires, a pressure sensor, and a 10k ohm resistor. Create the following circuit as shown:
-<CIRCUIT DIAGRAM HERE>
+![Asset 11](https://github.com/user-attachments/assets/dd0112fb-e486-4e43-990e-b35133373ac0)
 
 In Arduino, figure out which port the board is connected to. Copy and paste this to Arduino -> arduinotest.py, line 7 so the data can be sent to the python program.
 
