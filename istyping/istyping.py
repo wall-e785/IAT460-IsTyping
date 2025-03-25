@@ -27,6 +27,7 @@ bold_italic_font_path = pygame.font.match_font("verdana", True, True)
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(bold_italic_font_path, 48)
 h3 = pygame.font.Font(font_path, 20)
+h4 = pygame.font.Font(font_path, 17)
 transition_font = pygame.font.Font(bold_font_path,100)
 name_header = pygame.font.Font(bold_font_path, 48)
 
@@ -50,7 +51,7 @@ currSpeaker = ""
 optionHigh = "Anxious Response!"
 optionNeu = "Neutral Response!"
 optionLow = "Lowkey Response!"
-MAX_TEXT_LENGTH = 35
+MAX_TEXT_LENGTH = 28
 
 HIGH = 0
 NEUTRAL = 1
@@ -332,21 +333,25 @@ def textScreen():
     screen.blit(GUI.thinking_you.convert(), (684,539))
 
     #y-positions of the start of the text box depending on how many lines there are
-    HIGH_3LINES_Y = 309
-    HIGH_2LINES_Y = 320
-    HIGH_1LINE_Y = 333
+    HIGH_4LINES_Y = 304
+    HIGH_3LINES_Y = 314
+    HIGH_2LINES_Y = 326
+    HIGH_1LINE_Y = 337
 
-    NEU_3LINES_Y = 439
-    NEU_2LINES_Y = 450
-    NEU_1LINE_Y = 463
+    NEU_4LINES_Y = 435
+    NEU_3LINES_Y = 443
+    NEU_2LINES_Y = 455
+    NEU_1LINE_Y = 464
 
-    LOW_3LINES_Y = 559
-    LOW_2LINES_Y = 570
-    LOW_1LINE_Y = 583
+    LOW_4LINES_Y = 555
+    LOW_3LINES_Y = 563
+    LOW_2LINES_Y = 575
+    LOW_1LINE_Y = 585
 
-    THEM_3LINES_Y = 170
-    THEM_2LINES_Y = 181
-    THEM_1LINE_Y = 194
+    THEM_4LINES_Y = 165
+    THEM_3LINES_Y = 175
+    THEM_2LINES_Y = 186
+    THEM_1LINE_Y = 195
 
     high_num_lines = None
     neu_num_lines = None
@@ -359,56 +364,79 @@ def textScreen():
     formattedThem = grammar.format_text(currScreen.currMessage, MAX_TEXT_LENGTH)
 
     #for each of the options, check how many lines they need
-    if len(formattedHigh) == 3: #3 lines
+    if len(formattedHigh) == 4:
+        high_num_lines = HIGH_4LINES_Y
+        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines_+21))
+        screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+42))
+        screen.blit(h4.render(formattedHigh[3], True, (0,0,0)), (708, high_num_lines+63))
+    elif len(formattedHigh) == 3: #3 lines
         high_num_lines = HIGH_3LINES_Y
-        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h3.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
-        screen.blit(h3.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+48))
+        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+        screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+48))
     elif len(formattedHigh) == 2: #2 lines
         high_num_lines = HIGH_2LINES_Y
-        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h3.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
     elif len(formattedHigh) == 1: #1 line
         high_num_lines = HIGH_1LINE_Y 
-        screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
     else:
         high_num_lines = HIGH_1LINE_Y 
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
+        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
-    if len(formattedNeu) == 3: #3 lines
+    if len(formattedNeu) == 4:
+        neu_num_lines = NEU_4LINES_Y
+        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+21))
+        screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+42))
+        screen.blit(h4.render(formattedNeu[3], True, (0,0,0)), (708, neu_num_lines+63))
+    elif len(formattedNeu) == 3: #3 lines
         neu_num_lines = NEU_3LINES_Y
-        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h3.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
-        screen.blit(h3.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+48))
+        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+        screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+48))
     elif len(formattedNeu) == 2: #2 lines
         neu_num_lines = NEU_2LINES_Y
-        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h3.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
     elif len(formattedNeu) == 1: #1 line
         neu_num_lines = NEU_1LINE_Y
-        screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
     else:
         neu_num_lines = NEU_1LINE_Y
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
+        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
 
-
-    if len(formattedLow) == 3: #3 lines
+    if len(formattedLow) == 4:
+        low_num_lines = LOW_4LINES_Y
+        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+21))
+        screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+42))
+        screen.blit(h4.render(formattedLow[3], True, (0,0,0)), (708, low_num_lines+63))
+    elif len(formattedLow) == 3: #3 lines
         low_num_lines = LOW_3LINES_Y
-        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h3.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
-        screen.blit(h3.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+48))
+        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+        screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+48))
     elif len(formattedLow) == 2: #2 lines
         low_num_lines = LOW_2LINES_Y
-        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h3.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
     elif len(formattedLow) == 1: #1 line
         low_num_lines = LOW_1LINE_Y
-        screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
     else:
         low_num_lines = LOW_1LINE_Y
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
+        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
 
-    if len(formattedThem) == 3: #3 lines
+    if len(formattedThem) == 4: #3 lines
+        them_num_lines = THEM_4LINES_Y
+        screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h4.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+21))
+        screen.blit(h4.render(formattedThem[2], True, (0,0,0)), (215, them_num_lines+42))
+        screen.blit(h4.render(formattedThem[3], True, (0,0,0)), (215, them_num_lines+63))
+    elif len(formattedThem) == 3: #3 lines
         them_num_lines = THEM_3LINES_Y
         screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
         screen.blit(h3.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
@@ -422,7 +450,7 @@ def textScreen():
         screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
     else:
         them_num_lines = THEM_1LINE_Y 
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, them_num_lines))
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
 
 
     #rendering the speaker's message

@@ -13,9 +13,9 @@ friend_grammar1 = {
 
     #terminal symbols
     'V': ['bestest', 'favourite', 'coolest'],
-    'GREET': ['hi!', 'hello!', 'hey!'],
+    'GREET': ['Hi!', 'Hello!', 'Hey!'],
     'ASK': ['what\'s up', 'how are you', 'what are you doing'],
-    'FRIEND': ['friend', 'fren', 'bestie']
+    'FRIEND': ['friend?', 'fren?', 'bestie?']
 }
 
 you_grammar1 = {
@@ -23,7 +23,7 @@ you_grammar1 = {
     'S': [['GOOD', 'Det', 'LOC', 'TIME'], ['Det', 'LOC', 'it\'s', 'GOOD']],
 
     #terminal symbols
-    'GOOD': ['okay', 'good', 'great', 'fine'],
+    'GOOD': ['Okay', 'Good', 'Great', 'Fine'],
     'Det': ['I am', 'I\'m',  'just'],
     'LOC': ['in class', 'at home'],
     'TIME': ['now', 'right now', 'at the moment']
@@ -45,7 +45,7 @@ friend_grammar2 = {
     'MISS': ['missed out', 'missed', 'couldn\'t'],
 
     #otherwise
-    'S': [['IJ', 'well I', 'V', 'if you want to come to my', event, 'TIME'], ['ADJ', '-hey btw, my', event, 'is', 'TIME', 'and', 'PEOPLE', 'will be there', 'IN']],
+    'S': [['IJ', 'well I', 'V', 'if you want to come to my', event, 'TIME'], ['ADJ', '-hey btw, my', event, 'is', 'TIME', 'and', 'PEOPLE', 'will be there.', 'IN']],
 
     #terminal symbols
     'IJ': ['oh', 'ah', 'i see'],
@@ -75,7 +75,7 @@ friend_grammar3 = {
     'S': [['OK', 'LMK', 'been', 'BUSY'], ['BUSY', 'just', 'LMK']],
 
     #terminal symbols
-    'YES': ['kk', 'okay', 'ok'],
+    'YES': ['KK', 'Okay', 'Ok'],
     'LMK': ['lmk', 'let me know', 'tell me ASAP'],
     'BUSY': ['busy lately?', 'working hard lately?', 'stressed lately?']
 }
@@ -85,8 +85,8 @@ you_grammar3 = {
     'S': [['YES', 'HAVE', 'work has been', 'BUSY', 'and dating', 'BAD'], ['GROAN', 'dating', 'BAD', 'and work has been', 'BUSY']],
 
     #terminal symbols
-    'YES': ['yea', 'yes'],
-    'HAVE': ['i have', 'it has been'],
+    'YES': ['Yea', 'Yes'],
+    'HAVE': ['I have', 'it has been'],
     'BUSY': ['busy', 'stressful', 'exhausting'],
     'BAD': ['kinda sucks', 'isn\'t fun', 'is difficult'],
     'GROAN': ['ugh', 'awful', 'terrible']
@@ -102,7 +102,7 @@ friend_grammar4={
     'S-LOW': [['NOPROB', 'FRIEND', 'u\'ll', 'FINE', 'dw ttyl'], ['REMIND_LOW', 'u\'ll', 'FINE', 'ttyl']],
 
     #terminal symbols
-    'OK': ['ok', 'okay', 'aw'],
+    'OK': ['Ok', 'Okay', 'Aw'],
     'LUCK': ['good luck', 'have fun'],
     'FINE': ['be fine', 'do great', 'be okay'],
     'REMIND': ['don\'t forget to text!', 'last reminder to text later!', 'remember to confirm!'],
