@@ -8,7 +8,7 @@ REQUIREMENTS:
 -In the arduinohandler.py file, update the PORT variable to your board's port. This can be found in the Arduino environment, but remember to close it before running the Python file.
 -You will need a Google Gemini API key. store this in a file called env.py, with a variable called gemini
 
-**SETUP:**
+# SETUP:
 This project was created on Python 3.9.2. Download it from here: https://www.python.org/downloads/release/python-392/
 After downloading Python, create a virtual environment in VSCode to run the program. More information can be found here: https://code.visualstudio.com/docs/python/environments
 The following libaries are also required to be downloaded using pip into the virtual environment:
