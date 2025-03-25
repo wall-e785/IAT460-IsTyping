@@ -45,7 +45,8 @@ def format_text(sentence, maxLineLength):
     #for each character in the sentence, seperate the words (by spaces)
     for char in sentence:
         if char != " ":
-            tempString += char
+            if char != '\n':
+                tempString += char
         else:
             #once a space is encountered, check if the current word can be added to the current line without exceeding maxLineLength
             if (len(tempLine)+len(tempString)+1 <= maxLineLength):

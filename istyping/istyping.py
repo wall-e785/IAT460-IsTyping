@@ -102,16 +102,15 @@ class Button:
     def draw(self):
          pygame.draw.rect(screen, self.color, self.visual, 0, 10) 
 
-#referenced transition screen from https://stackoverflow.com/questions/58540537/how-to-fade-the-screen-out-and-back-in-using-pygame
+#referenced and modified transition screen from https://stackoverflow.com/questions/58540537/how-to-fade-the-screen-out-and-back-in-using-pygame
 #also referenced this to learn more about alpha in pygame: https://stackoverflow.com/questions/6339057/draw-transparent-rectangles-and-polygons-in-pygame
 class Fader:
 
     def __init__(self):
         self.fading = None
         self.alpha = 0
-        self.surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.surf.set_alpha(self.alpha)
-        self.surf.fill((0,0,0))
+        self.bg = pygame.image.load("istyping/images/blacktransition.jpg")
+        self.bg.set_alpha(self.alpha)
 
     def next(self):
         if not self.fading:
@@ -122,28 +121,41 @@ class Fader:
         if self.fading == 'OUT' or self.fading == 'IN':
             self.update()
             print(self.alpha)
-            screen.blit(self.surf, (0,0))
-        # if self.fading:
-        #     self.veil.set_alpha(self.alpha)
-        #     screen.blit(self.veil, (0, 0))
+            self.bg.set_alpha(self.alpha)
+            screen.blit(self.bg, (0,0))
 
     def update(self):
         if self.fading == 'OUT':
-            self.alpha += 17
+            self.alpha += 3
             if self.alpha >= 255:
-                global state, currScreen, currSpeaker, countingdown 
-                if state == MAIN:
-                    preferences.setup()
-                    state = FRIEND      
-                    countingdown = True
-                    currSpeaker = "friend"
-                    currScreen = FriendScreen()
+                global state, currScreen
+                if state == INTRO:
+                    currScreen = TransitionScreen("Friend")
+                    state = TRANSITION
+                elif state == TRANSITION:
+                    global currSpeaker, countingdown
+                    if currScreen.name == "Friend":
+                        preferences.setup()
+                        state = FRIEND      
+                        countingdown = True
+                        currSpeaker = "friend"
+                        currScreen = FriendScreen()
+                    elif currScreen.name == "Date":
+                        state = DATE
+                        currSpeaker = "date"
+                        currScreen = DateScreen()
+                        pygame.time.delay(1000)
+                    elif currScreen.name == "Boss":
+                        state = BOSS
+                        currSpeaker = "boss"
+                        currScreen = BossScreen()
+                        pygame.time.delay(1000)
                 self.fading = 'IN'
         else:
-            self.alpha -= 17
+            self.alpha -= 5
             if self.alpha <= 0:
                 self.fading = None  
-        self.surf.set_alpha(self.alpha)
+
   
 # create an instance for Arduino Board
 analogPrinter = Arduino.AnalogPrinter()
@@ -360,6 +372,7 @@ def textScreen():
         high_num_lines = HIGH_1LINE_Y 
         screen.blit(h3.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
     else:
+        high_num_lines = HIGH_1LINE_Y 
         screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
     if len(formattedNeu) == 3: #3 lines
@@ -375,7 +388,8 @@ def textScreen():
         neu_num_lines = NEU_1LINE_Y
         screen.blit(h3.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
     else:
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
+        neu_num_lines = NEU_1LINE_Y
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
 
 
     if len(formattedLow) == 3: #3 lines
@@ -391,7 +405,8 @@ def textScreen():
         low_num_lines = LOW_1LINE_Y
         screen.blit(h3.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
     else:
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
+        low_num_lines = LOW_1LINE_Y
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
 
     if len(formattedThem) == 3: #3 lines
         them_num_lines = THEM_3LINES_Y
@@ -406,7 +421,8 @@ def textScreen():
         them_num_lines = THEM_1LINE_Y 
         screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
     else:
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
+        them_num_lines = THEM_1LINE_Y 
+        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (708, them_num_lines))
 
 
     #rendering the speaker's message
@@ -601,8 +617,12 @@ def tutScreen():
                 state = MAIN
                 currScreen = HomeScreen()
             elif(nextButton.checkMousePress(pos[0], pos[1])):
-                currScreen = TransitionScreen("Friend")
-                state = TRANSITION
+                global fader
+                if fader.fading == None:
+                    fader.next()
+                    print("next!")
+            #     currScreen = TransitionScreen("Friend")
+            #     state = TRANSITION
 
             
 def endScreen():
@@ -637,12 +657,12 @@ alpha = 0
 name_pos = -200
 showName = False
 done = False
-stay_on_screen = 2
+stay_on_screen = 4
 
 def transitionLoop():
     screen.fill((255,255,255))
+
     global currScreen, alpha, showName, name_pos, done, stay_on_screen 
-    
     #referenced transparency from: https://www.youtube.com/watch?v=8_HVdxBqJmE
     bg = currScreen.bg.copy()
     if alpha < 255 and not done:
@@ -654,7 +674,7 @@ def transitionLoop():
     screen.blit(bg, (0,0))
 
     if showName:
-        if name_pos < 420:
+        if name_pos < 450:
             name_pos+=15
         else:
             showName = False
@@ -666,26 +686,24 @@ def transitionLoop():
         name_pos = -200
         showName = False
         done = False
-        stay_on_screen =2
-        global state, currSpeaker, countingdown 
-        if currScreen.name == "Friend":
-            preferences.setup()
-            state = FRIEND      
-            countingdown = True
-            currSpeaker = "friend"
-            currScreen = FriendScreen()
-        elif currScreen.name == "Date":
-            state = DATE
-            currSpeaker = "date"
-            currScreen = DateScreen()
-            pygame.time.delay(1000)
-        elif currScreen.name == "Boss":
-            state = BOSS
-            currSpeaker = "boss"
-            currScreen = BossScreen()
-            pygame.time.delay(1000)
-
-    pygame.display.flip()
+        stay_on_screen = 4
+        # global state, currSpeaker, countingdown , fader
+        # if currScreen.name == "Friend":
+        #     # preferences.setup()
+        #     # state = FRIEND      
+        #     # countingdown = True
+        #     # currSpeaker = "friend"
+        #     # currScreen = FriendScreen()
+        # elif currScreen.name == "Date":
+        #     # state = DATE
+        #     # currSpeaker = "date"
+        #     # currScreen = DateScreen()
+        #     # pygame.time.delay(1000)
+        # elif currScreen.name == "Boss":
+        #     # state = BOSS
+        #     # currSpeaker = "boss"
+        #     # currScreen = BossScreen()
+        #     # pygame.time.delay(1000)
 
     #event handlers
     for event in pygame.event.get():
@@ -693,6 +711,8 @@ def transitionLoop():
             global run
             run = False 
         elif event.type == TIMEREVENT:
+            if fader.fading == None and stay_on_screen < 4:
+                fader.next()
             if done and stay_on_screen > 0:
                 stay_on_screen -= 1
 
@@ -752,13 +772,12 @@ while run:
         transitionLoop()
     elif state == FRIEND_END:
         friendEndLoop()
-    
-    #fader.draw()
-    #clear screen with each iteration
+
 
     #pygame.draw.rect(screen, (0,255,0), player)
     #key = pygame.key.get_pressed()
-
+    if fader.fading != None:
+        fader.draw()
     #updates screen to display objects
     pygame.display.update()
     
