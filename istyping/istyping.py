@@ -105,7 +105,6 @@ class Fader:
     def draw(self):
         if self.fading == 'OUT' or self.fading == 'IN':
             self.update()
-            print(self.alpha)
             self.bg.set_alpha(self.alpha)
             screen.blit(self.bg, (0,0))
 
@@ -631,7 +630,8 @@ def textScreen():
                             preferences.check_friend(selected)
                         elif state == DATE:
                             preferences.check_date(selected)
-                        get_messages()
+                        if fader.fading == None:
+                            get_messages()
                     elif state == BOSS:
                         if message_counter <= 5:
                             if analogPrinter.data > (1/3)*2:
@@ -641,7 +641,8 @@ def textScreen():
                             elif analogPrinter.data < 1/3:
                                 selected = LOW
                             preferences.check_boss(selected)
-                        get_messages()
+                        if fader.fading == None:
+                            get_messages()
                     print(selected)   
 def tutScreen():
     screen.fill((255,255,255))
