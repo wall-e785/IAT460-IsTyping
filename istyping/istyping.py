@@ -179,15 +179,31 @@ class HomeScreen:
 class FriendScreen:
     def __init__(self):
         self.name = "FRIEND"
-        self.currMessage = grammar.generate('S', friend.friend_grammar1)
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
 
         global optionHigh
         global optionNeu
         global optionLow
 
+        self.conversation = [
+            grammar.generate('S', friend.friend_grammar1),
+            grammar.generate('S', friend.you_grammar1),
+            grammar.generate('S', friend.friend_grammar2),
+            grammar.generate('S', friend.you_grammar2),
+            grammar.generate('S', friend.friend_grammar3),
+            grammar.generate('S', friend.you_grammar3),
+        ]
+
+        if preferences.friend_anxiousness >= 50:
+            self.conversation.append(grammar.generate('S-HIGH', friend.friend_grammar4))
+        else:    
+            self.conversation.append(grammar.generate('S-LOW', friend.friend_grammar4))
+        
+        self.conversation.append(grammar.generate('S', friend.you_grammar4))
+
+        self.currMessage = self.conversation[0]
         grammar.processing = True
-        optionNeu = grammar.generate('S', friend.you_grammar1)
+        optionNeu = self.conversation[1]
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'HIGH')
         optionLow = grammar.get_prompt(self.currMessage, optionNeu, 'friend', 'LOW')
 
@@ -471,33 +487,35 @@ def textScreen():
         #generate messages depending on the current speaker, and determine the set based on the message number
         if state == FRIEND:
             if(message_counter == 2):
-                optionNeu = grammar.generate('S', friend.you_grammar2)
-                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
-                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-
                 if selected == HIGH:
                     if preferences.friend_anxiousness>=50:
-                        currScreen.currMessage = grammar.generate('S-HIGH-GOOD', friend.friend_grammar2)
+                        currScreen.conversation[2] = grammar.generate('S-HIGH-GOOD', friend.friend_grammar2)
                     else:
-                        currScreen.currMessage = grammar.generate('S-LOW-BAD', friend.friend_grammar2)
+                        currScreen.conversation[2] = grammar.generate('S-LOW-BAD', friend.friend_grammar2)
                 else:
-                    currScreen.currMessage = grammar.generate('S', friend.friend_grammar2)
-            elif(message_counter == 3):
-                optionNeu = grammar.generate('S', friend.you_grammar3)
+                    currScreen.conversation[2] = grammar.generate('S', friend.friend_grammar2)
+                currScreen.currMessage = currScreen.conversation[2]
+                optionNeu = currScreen.conversation[3] #grammar.generate('S', friend.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-                currScreen.currMessage = grammar.generate('S', friend.friend_grammar3)
+            elif(message_counter == 3):
+                currScreen.currMessage = currScreen.conversation[4] #grammar.generate('S', friend.friend_grammar3)
+                optionNeu = currScreen.conversation[5]#grammar.generate('S', friend.you_grammar3)
+                optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
 
                 friend.friend_responded = selected
             elif(message_counter == 4):
-                optionNeu = grammar.generate('S', friend.you_grammar4)
+                currScreen.currMessage = currScreen.conversation[6]
+
+                optionNeu = currScreen.conversation[7]#grammar.generate('S', friend.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
 
-                if preferences.friend_anxiousness >= 50:
-                    currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
-                else:    
-                    currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
+                # if preferences.friend_anxiousness >= 50:
+                #     currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
+                # else:    
+                #     currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
             else:
                 pygame.time.delay(3000)
                 message_counter = 1

@@ -34,7 +34,7 @@ friend_grammar2 = {
         #if the friend has a high anxiousness
     'S-HIGH-GOOD': [['UNDERSTAND', 'I really want to see you at my', event, 'TIME', 'NOPRESSURE']],
         #if the friend has a low anxiousness
-    'S-HIGH-BAD': [['PAUSE', 'my', event, 'is', 'TIME', 'WISH', 'see u there'], ['PAUSE', 'DUDE', 'u gotta come to my', event, 'TIME', 'plsss'], 'PAUSE', 'come to my', event, 'TIME', 'you', 'MISS', 'last time'],
+    'S-LOW-BAD': [['PAUSE', 'my', event, 'is', 'TIME', 'WISH', 'see u there'], ['PAUSE', 'DUDE', 'u gotta come to my', event, 'TIME', 'plsss'], 'PAUSE', 'come to my', event, 'TIME', 'you', 'MISS', 'last time'],
 
     #terminal symbols
     'PAUSE': ['oh...', 'uhh, okay...', 'you good? anyways'],

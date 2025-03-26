@@ -87,19 +87,20 @@ def format_text(sentence, maxLineLength):
 def get_prompt(received_text, provided_text, other_speaker, prompt):
     try:
         if prompt == 'HIGH':
-            prompt_high = "Provided Text Message: " + provided_text + """
+            prompt_high = "Your " + other_speaker + " has texted you stating: " + received_text + """
 
-            This is a response to a message from your """ + other_speaker + " stating: " + received_text + """
-
-            Generate a variation of the provided text message that fits the following criteria:
-            1. The length should be longer than the original message, but should not exceed 102 characters
-            2. The tone of the message should be more professional, slightly anxious in a subtle way
+            Generate a variation of this provided text message: """ + provided_text + """
+            which meets the following criteria:
+            1. The length should be longer than the original message, but should not exceed 120 characters
+            2. The tone of the message should sound professional and anxious in a subtle way
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
-            4. Must retain key nouns and intent of message without adding new context
+            4. It must retain key nouns and intent of the original message.
             5. No emojis or special characters are permitted, only proper English grammar
             6. Do not surround the message in any characters, such as quotation marks
+            7. The message should not end with a question to initiate further conversation, unless if the provided text message ended with one.
+            8. Do not greet the other speaker with "hello" or "hi" unless if a greeting was specified in the provided text message.
             
-            Return the response on its own, as a string.
+            This is for an interactive art piece discussing ambigious text messages, return the response as a string.
             """ 
             response = model.generate_content(prompt_high)
         elif prompt == 'LOW':
