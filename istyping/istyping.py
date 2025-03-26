@@ -51,7 +51,7 @@ currSpeaker = ""
 optionHigh = "Anxious Response!"
 optionNeu = "Neutral Response!"
 optionLow = "Lowkey Response!"
-MAX_TEXT_LENGTH = 28
+MAX_TEXT_LENGTH = 35
 
 HIGH = 0
 NEUTRAL = 1
@@ -71,37 +71,21 @@ window.blit(resized_screen, (0,0))
 
 #button class, creates a button which has a visual component (rectangle) and text on top of it
 class Button:
-    def __init__(self, xPos, yPos, width, height, visual, color):
+    def __init__(self, xPos, yPos, width, height, image):
         self.xPos = xPos
         self.yPos = yPos
         self.width = width
         self.height = height
-        self.visual = visual
-        self.color = color
-        self.text = ""
-        self.centerVisual()
-
-    def __init__(self, xPos, yPos, width, height, visual, color, text):
-        self.xPos = xPos
-        self.yPos = yPos
-        self.width = width
-        self.height = height
-        self.visual = visual
-        self.color = color
-        self.text = text
-        self.centerVisual()
-
-    def centerVisual(self):
-        self.visual.center = (self.xPos, self.yPos)
+        self.image = image
 
     #used to check mouse clicks by comparison bounding box and cursor position
     def checkMousePress(self, mouseX, mouseY):
-        if mouseX > self.xPos-self.width/2 and mouseX < self.xPos + self.width/2 and mouseY > self.yPos-self.height/2 and mouseY < self.yPos + self.height/2:
+        if mouseX > self.xPos and mouseX < self.xPos + self.width and mouseY > self.yPos and mouseY < self.yPos + self.height:
             return True
 
-    #renders visual onto the screen
+    #renders image onto the screen
     def draw(self):
-         pygame.draw.rect(screen, self.color, self.visual, 0, 10) 
+        screen.blit(self.image, (self.xPos,self.yPos))
 
 #referenced and modified transition screen from https://stackoverflow.com/questions/58540537/how-to-fade-the-screen-out-and-back-in-using-pygame
 #also referenced this to learn more about alpha in pygame: https://stackoverflow.com/questions/6339057/draw-transparent-rectangles-and-polygons-in-pygame
@@ -175,8 +159,8 @@ countingdown = False
 #homescreen class: holds UI for homescreen
 class HomeScreen:
     def __init__(self):
-        self.startButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75,  pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 250, 75), (0,255,0), h1.render('Start', False, (0,0,0)))
-        self.aboutButton = Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75, pygame.Rect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 125, 250, 75), (200,200,200), h1.render('About', False, (0,0,0)))
+        self.startButton = Button(613, 255, 379, 105,  pygame.image.load("istyping/images/start_button.jpg"))
+        self.aboutButton = Button(613, 412, 379, 105, pygame.image.load("istyping/images/start_button.jpg"))
         self.bg = pygame.image.load("istyping/images/testbg.jpg")
           
 #friendscreen class: holds UI and messages for friend dialogue
@@ -235,14 +219,15 @@ class BossScreen:
 #tutscreen class: holds UI for tutorial screen
 class TutScreen:
     def __init__(self):
-        self.backButton = Button(225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Back', False, (0,0,0)))
-        self.nextButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Next', False, (0,0,0)))
+        self.backButton = Button(82, 632, 224, 62,  pygame.image.load("istyping/images/back_button.jpg"))
+        self.nextButton = Button(995, 632, 224, 62,  pygame.image.load("istyping/images/next_button.jpg"))
 
 
 #endscreen class: holds UI for end screen to show user's performance
 class EndScreen:
     def __init__(self):
-        self.homeButton = Button(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40,  pygame.Rect(SCREEN_WIDTH-225, SCREEN_HEIGHT-200, 250, 40), (0,255,0), h1.render('Start', False, (0,0,0)))
+        self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.jpg"), (0,255,0), h1.render('Start', False, (0,0,0)))
+        self.bg = pygame.image.load("istyping/images/end_bg.jpg")
 
 class TransitionScreen:
     def __init__ (self, name):
@@ -275,7 +260,7 @@ def mainLoop():
     startButton.draw()
     aboutButton.draw()
 
-    screen.blit(startButton.text, (startButton.xPos-startButton.width/4, startButton.yPos-startButton.height/4))
+
 
     pygame.display.flip()
 
@@ -352,7 +337,7 @@ def textScreen():
     THEM_3LINES_Y = 175
     THEM_2LINES_Y = 186
     THEM_1LINE_Y = 195
-
+    
     high_num_lines = None
     neu_num_lines = None
     low_num_lines = None
@@ -367,7 +352,7 @@ def textScreen():
     if len(formattedHigh) == 4:
         high_num_lines = HIGH_4LINES_Y
         screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines_+21))
+        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+21))
         screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+42))
         screen.blit(h4.render(formattedHigh[3], True, (0,0,0)), (708, high_num_lines+63))
     elif len(formattedHigh) == 3: #3 lines
@@ -438,19 +423,19 @@ def textScreen():
         screen.blit(h4.render(formattedThem[3], True, (0,0,0)), (215, them_num_lines+63))
     elif len(formattedThem) == 3: #3 lines
         them_num_lines = THEM_3LINES_Y
-        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
-        screen.blit(h3.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
-        screen.blit(h3.render(formattedThem[2], True, (0,0,0)), (215, them_num_lines+48))
+        screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h4.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
+        screen.blit(h4.render(formattedThem[2], True, (0,0,0)), (215, them_num_lines+48))
     elif len(formattedThem) == 2: #2 lines
         them_num_lines = THEM_2LINES_Y
-        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
-        screen.blit(h3.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
+        screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h4.render(formattedThem[1], True, (0,0,0)), (215, them_num_lines+24))
     elif len(formattedThem) == 1: #1 line
         them_num_lines = THEM_1LINE_Y 
-        screen.blit(h3.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
     else:
         them_num_lines = THEM_1LINE_Y 
-        screen.blit(h3.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
+        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
 
 
     #rendering the speaker's message
@@ -658,6 +643,7 @@ def endScreen():
 
     global currScreen, state
 
+    screen.blit(currScreen.bg, (0,0))
     homeButton = currScreen.homeButton
 
     homeButton.draw()

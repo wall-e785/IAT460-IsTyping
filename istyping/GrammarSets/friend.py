@@ -23,7 +23,7 @@ you_grammar1 = {
     'S': [['GOOD', 'Det', 'LOC', 'TIME'], ['Det', 'LOC', 'it\'s', 'GOOD']],
 
     #terminal symbols
-    'GOOD': ['Okay', 'Good', 'Great', 'Fine'],
+    'GOOD': ['okay', 'good', 'great', 'fine'],
     'Det': ['I am', 'I\'m',  'just'],
     'LOC': ['in class', 'at home'],
     'TIME': ['now', 'right now', 'at the moment']
