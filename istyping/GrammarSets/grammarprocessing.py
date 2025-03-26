@@ -64,10 +64,14 @@ def format_text(sentence, maxLineLength):
 
     #check if the last string was added to the last line
     if len(tempString) > 0:
-        if len(tempLine) <= 0:
-            tempLine = tempString
+        if (len(tempLine)+len(tempString)+1 <= maxLineLength):
+                if len(tempLine) <= 0:
+                    tempLine = tempString
+                else:
+                    tempLine = tempLine + " " + tempString
         else:
-            tempLine = tempLine + " " + tempString
+            listoflines.append(tempLine)
+            tempLine = tempString
 
     #now check if the last line was added to the list
     if len(tempLine) > 0:
