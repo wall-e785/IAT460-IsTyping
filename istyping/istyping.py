@@ -32,7 +32,7 @@ h4 = pygame.font.Font(font_path, 25)
 h5 = pygame.font.Font(font_path, 30)
 
 transition_font = pygame.font.Font(bold_font_path, 175)
-name_header = pygame.font.Font(bold_font_path, 60)
+name_header = pygame.font.Font(bold_font_path, 90)
 
 #set up sound, referenced from: https://opensource.com/article/20/9/add-sound-python-game
 pygame.mixer.init()

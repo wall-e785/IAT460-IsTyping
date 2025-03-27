@@ -82,8 +82,8 @@ boss_grammar5 = {
     'S-CASUAL-CARE': [['NP', 'are you ok?', 'You seem', 'STRESS']],
 
     #otherwise just respond neutrally
-    'S-PROF': ['NP'],
-    'S-CASUAL': ['NP', ':)'],
+    'S-PROF': [['NP']],
+    'S-CASUAL': [['NP', ':)']],
 
     #terminal symbols
     'NP': ['No problem', 'No worries'],
