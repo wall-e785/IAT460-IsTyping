@@ -25,7 +25,7 @@ On a single line, enter: GEMINI_KEY = "<YOUR KEY HERE>" for the other files to a
 Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
 
 # Credits:
-Created by Wallace Chau
+Created by Wallace Chau (developer, graphics, generative grammar sets)
 
 Special thanks to Tino de Bruijn and Bernd Porr for creating pyfirmata2: https://github.com/berndporr/pyFirmata2
 
