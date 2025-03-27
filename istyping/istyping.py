@@ -20,15 +20,15 @@ pygame.display.set_caption("is-typing")
 
 #intiliaze fonts
 pygame.font.init()
-font_path = pygame.font.match_font("verdana")
-bold_font_path = pygame.font.match_font("verdana", True)
-italic_font_path = pygame.font.match_font("verdana", False, True)
-bold_italic_font_path = pygame.font.match_font("verdana", True, True)
+font_path = pygame.font.match_font("sf pro")
+bold_font_path = pygame.font.match_font("sf pro", True)
+italic_font_path = pygame.font.match_font("sf pro", False, True)
+bold_italic_font_path = pygame.font.match_font("sf pro", True, True)
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(bold_italic_font_path, 48)
 h3 = pygame.font.Font(font_path, 20)
 h4 = pygame.font.Font(font_path, 17)
-transition_font = pygame.font.Font(bold_font_path,100)
+transition_font = pygame.font.Font(bold_font_path, 175)
 name_header = pygame.font.Font(bold_font_path, 48)
 
 #states for FSM
@@ -171,7 +171,7 @@ countingdown = False
 class HomeScreen:
     def __init__(self):
         self.startButton = Button(613, 255, 379, 105,  pygame.image.load("istyping/images/start_button.jpg"))
-        self.aboutButton = Button(613, 412, 379, 105, pygame.image.load("istyping/images/start_button.jpg"))
+        self.aboutButton = Button(613, 412, 379, 105, pygame.image.load("istyping/images/credits_button.jpg"))
         self.bg = pygame.image.load("istyping/images/testbg.jpg")
           
 #friendscreen class: holds UI and messages for friend dialogue
