@@ -13,6 +13,9 @@ To setup the Arduino board, you will need to upload the StandardFirmata example 
 You will also need wires, a pressure sensor, and a 10k ohm resistor. Create the following circuit as shown:
 ![Circuit Diagram](https://github.com/user-attachments/assets/dd0112fb-e486-4e43-990e-b35133373ac0)
 
+A 10G-5KG (1" Area) Force Pressure Sensor (exact model shown below) was used to gather input for this project. To learn more about Force Pressure Sensors (FSR), read here: https://learn.adafruit.com/force-sensitive-resistor-fsr/overview 
+<img width="343" alt="Screenshot 2025-03-27 at 12 56 26 PM" src="https://github.com/user-attachments/assets/d33d41bd-5aa3-469f-9634-bd80653ae418" />
+
 In Arduino, figure out which port the board is connected to. Copy and paste this to Arduino -> arduinotest.py, line 7 so the data can be sent to the python program.
 
 A Google Gemini API key is also required; find more information here: https://aistudio.google.com/
