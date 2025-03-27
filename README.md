@@ -6,6 +6,7 @@ This project was created for SFU IAT 460 - Generative AI and Computational Creat
 # Setup:
 This project was created on Python 3.9.2. Download it from here: https://www.python.org/downloads/release/python-392/
 After downloading Python, create a virtual environment in VSCode to run the program. More information can be found here: https://code.visualstudio.com/docs/python/environments
+
 The following libaries are also required to be downloaded using pip into the virtual environment: _pygame, google.generativeai, dotenv, pyfirmata2, math, rand_
 
 To setup the Arduino board, you will need to upload the StandardFirmata example sketch. More information to find this sketch in Arduino can be found here, as well as the original documentation of pyfirmata2: https://github.com/berndporr/pyFirmata2
@@ -18,6 +19,11 @@ A Google Gemini API key is also required; find more information here: https://ai
 Once you have an API key, create a file in the main hierarchy called .env
 On a single line, enter: GEMINI_KEY = "<YOUR KEY HERE>" for the other files to access the Gemini API
 
-Once all the setup steps are complete, you are ready to run the program. 
+Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
 
 # Credits:
+Created by Wallace Chau
+
+Special thanks to Tino de Bruijn and Bernd Porr for creating pyfirmata2: https://github.com/berndporr/pyFirmata2
+
+Special thanks for ZapSplat.com for providing the sound effects for this project. Standard License information can be found here: https://www.zapsplat.com/license-type/standard-license/
