@@ -25,12 +25,14 @@ font_path = pygame.font.match_font("sf pro")
 bold_font_path = pygame.font.match_font("sf pro", True)
 italic_font_path = pygame.font.match_font("sf pro", False, True)
 bold_italic_font_path = pygame.font.match_font("sf pro", True, True)
-h1 = pygame.font.Font(font_path, 32)
-h2 = pygame.font.Font(bold_italic_font_path, 48)
-h3 = pygame.font.Font(font_path, 30)
+h1 = pygame.font.Font(font_path, 40)
+h2 = pygame.font.Font(bold_italic_font_path, 60)
+h3 = pygame.font.Font(bold_font_path, 30)
 h4 = pygame.font.Font(font_path, 25)
+h5 = pygame.font.Font(font_path, 30)
+
 transition_font = pygame.font.Font(bold_font_path, 175)
-name_header = pygame.font.Font(bold_font_path, 48)
+name_header = pygame.font.Font(bold_font_path, 60)
 
 #set up sound, referenced from: https://opensource.com/article/20/9/add-sound-python-game
 pygame.mixer.init()
@@ -131,6 +133,7 @@ class Fader:
                 elif state == TRANSITION:
                     global currSpeaker, countingdown
                     if currScreen.name == "Friend":
+                        friend.choose_event()
                         preferences.setup()
                         state = FRIEND      
                         countingdown = True
@@ -155,11 +158,13 @@ class Fader:
                     state = TRANSITION
                     pygame.mixer.Sound.play(transition_sound)
                 elif state == BOSS:
+                    currScreen = FriendEndScreen()
                     state = FRIEND_END
-                    currScreen = friendEndScreen()
+                    global receive_sound
+                    pygame.mixer.Sound.play(receive_sound)
                 elif state == FRIEND_END:
+                    currScreen = EndScreen()
                     state = END
-                    currScreen = endScreen()
                 self.fading = 'IN'
         else:
             self.alpha -= 5
@@ -190,8 +195,8 @@ display_selected = None
 #homescreen class: holds UI for homescreen
 class HomeScreen:
     def __init__(self):
-        self.startButton = Button(613, 255, 379, 105,  pygame.image.load("istyping/images/start_button.jpg"))
-        self.aboutButton = Button(613, 412, 379, 105, pygame.image.load("istyping/images/credits_button.jpg"))
+        self.startButton = Button(620, 255, 379, 105,  pygame.image.load("istyping/images/start_button.jpg"))
+        self.aboutButton = Button(620, 412, 379, 105, pygame.image.load("istyping/images/credits_button.jpg"))
         self.bg = pygame.image.load("istyping/images/testbg.jpg")
           
 #friendscreen class: holds UI and messages for friend dialogue
@@ -274,12 +279,12 @@ class TutScreen:
     def __init__(self):
         self.backButton = Button(82, 632, 224, 62,  pygame.image.load("istyping/images/back_button.jpg"))
         self.nextButton = Button(995, 632, 224, 62,  pygame.image.load("istyping/images/next_button.jpg"))
-
+        self.bg = pygame.image.load("istyping/images/tutorialbg.jpg")
 
 #endscreen class: holds UI for end screen to show user's performance
 class EndScreen:
     def __init__(self):
-        self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.jpg"), (0,255,0), h1.render('Start', False, (0,0,0)))
+        self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
         self.bg = pygame.image.load("istyping/images/end_bg.jpg")
 
 class TransitionScreen:
@@ -287,7 +292,7 @@ class TransitionScreen:
         self.bg = pygame.image.load("istyping/images/transition_bg.jpg")
         self.name = name
 
-class friendEndScreen:
+class FriendEndScreen:
     def __init__ (self):
         self.messageimg = pygame.image.load("istyping/images/friend_final_text.jpg")
         self.yPos = SCREEN_HEIGHT
@@ -338,8 +343,14 @@ def textScreen():
     screen.fill((255,255,255))
     screen.blit(currScreen.bg.convert(), (0,0))
 
-    screen.blit(GUI.profile_icon.convert(), (38,216))
-    screen.blit(GUI.text_them.convert(), (155,151))
+    if state != DATE:
+        screen.blit(GUI.profile_icon.convert(), (38,216))
+        screen.blit(GUI.text_them.convert(), (155,151))
+    else:
+        if message_counter != 1:
+            screen.blit(GUI.profile_icon.convert(), (38,216))
+            screen.blit(GUI.text_them.convert(), (155,151))
+        
     screen.blit(GUI.profile_icon.convert(), (1143,595))
 
 
@@ -487,7 +498,7 @@ def textScreen():
         else:
             low_num_lines = LOW_1LINE_Y
             screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
-
+    
     if len(formattedThem) == 4: #3 lines
         them_num_lines = THEM_4LINES_Y
         screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
@@ -507,13 +518,20 @@ def textScreen():
         them_num_lines = THEM_1LINE_Y 
         screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
     else:
-        them_num_lines = THEM_1LINE_Y 
-        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
+        if state != DATE:
+            them_num_lines = THEM_1LINE_Y 
+            screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
+        else:
+            if message_counter !=1:
+                them_num_lines = THEM_1LINE_Y 
+                screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (215, them_num_lines))
+                
 
 
     #rendering the speaker's message
     screen.blit(name_header.render(currSpeaker, True, (0,0,0)), (575, 24))
-    screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (865, 200))
+    if not display_countingdown:
+        screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (875, 215))
 
     #referenced countdown arc from: https://stackoverflow.com/questions/67168804/how-to-make-a-circular-countdown-timer-in-pygame
     percentage = (arduino_countdown*11)/100
@@ -721,8 +739,10 @@ def textScreen():
                         print(selected)   
 def tutScreen():
     screen.fill((255,255,255))
-
+    
     global currScreen, state
+
+    screen.blit(currScreen.bg.convert(), (0,0))
 
     backButton = currScreen.backButton
     nextButton = currScreen.nextButton
@@ -756,15 +776,12 @@ def endScreen():
 
     homeButton.draw()
 
-    screen.blit(h2.render("Friend Casualness: " + str(preferences.friend_anxiousness) + "%", True, (0,0,0)), (20, 40))
-    screen.blit(h2.render("Date Eagerness: " + str(preferences.date_eagerness) + "%", True, (0,0,0)), (20, 60))
-    screen.blit(h2.render("Boss Professionalism: " + str(preferences.boss_professionalism) + "%", True, (0,0,0)), (20, 80))
-
-    screen.blit(h2.render("Friend Correct: " + str(preferences.friend_correct) + "/8", True, (0,0,0)), (400, 40))
-    screen.blit(h2.render("Date Correct: " + str(preferences.date_correct) + "/8", True, (0,0,0)), (400, 60))
-    screen.blit(h2.render("Boss Correct: " + str(preferences.boss_correct) + "/10", True, (0,0,0)), (400, 80))
-
-
+    screen.blit(h3.render("The friend...", True, (0,0,0)), (279, 310))
+    screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (410, 310))
+    screen.blit(h3.render("The date...", True, (0,0,0)), (279, 345))
+    screen.blit(h5.render(preferences.get_date() + ", they liked the tone of " + preferences.get_date_score() + " of your messages", True, (0,0,0)), (400, 345))
+    screen.blit(h3.render("The boss...", True, (0,0,0)), (279, 380))
+    screen.blit(h5.render(preferences.get_boss() + ", they liked the tone of " + preferences.get_boss_score() + " of your messages", True, (0,0,0)), (400, 380))
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #exit button
             global run
@@ -837,25 +854,23 @@ def friendEndLoop():
     currScreen.messageimg.set_alpha(currScreen.alpha)
     screen.blit(currScreen.messageimg, (265,currScreen.yPos))
 
-    START_POINT = 323
+    START_POINT = 327
     MAX_LENGTH = 37
 
     formatted_message = grammar.format_text(currScreen.text, MAX_LENGTH)
 
     if currScreen.yPos >=253 and currScreen.alpha > 25:
         if len(formatted_message) == 3: #3 lines
-            screen.blit(h1.render("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", True, (0,0,0)), (490, START_POINT))
-            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (490, START_POINT))
-            screen.blit(h1.render(formatted_message[1], True, (0,0,0)), (490, START_POINT+40))
-            screen.blit(h1.render(formatted_message[2], True, (0,0,0)), (490, START_POINT+80))
+            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (495, START_POINT))
+            screen.blit(h1.render(formatted_message[1], True, (0,0,0)), (495, START_POINT+40))
+            screen.blit(h1.render(formatted_message[2], True, (0,0,0)), (495, START_POINT+80))
         elif len(formatted_message) == 2: #2 lines
-            screen.blit(h1.render("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", True, (0,0,0)), (490, START_POINT))
-            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (490, START_POINT))
-            screen.blit(h1.render(formatted_message[1], True, (0,0,0)), (490, START_POINT+40))
+            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (495, START_POINT))
+            screen.blit(h1.render(formatted_message[1], True, (0,0,0)), (495, START_POINT+40))
         elif len(formatted_message) == 1: #1 line
-            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (490, START_POINT))
+            screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (495, START_POINT))
         else:
-            screen.blit(h1.render("Error: Message too long", True, (0,0,0)), (490, START_POINT))
+            screen.blit(h1.render("Error: Message too long", True, (0,0,0)), (495, START_POINT))
 
     if stay_on_screen2 == 0:
         stay_on_screen2 = 10

@@ -43,3 +43,41 @@ def check_boss(selected):
         boss_correct +=1
     elif (selected == 0 and boss_professionalism >=50) or (selected == 2 and boss_professionalism <= 50):
         boss_correct +=2
+
+def get_friend():
+    if friend_anxiousness >= 50:
+        return "was an anxious person"
+    else:
+        return "was a laidback person"
+def get_date():
+    if date_eagerness >=50:
+        return "was eager to meet"
+    else:
+        return "was uneager to meet"
+def get_boss():
+    if boss_professionalism >= 50:
+        return "preferred professional messages"
+    else:
+        return "preferred casual messages"
+    
+def get_friend_score():
+    global friend_correct
+    if friend_correct >= 4:
+        return "most"
+    else:
+        return "little"
+    
+def get_date_score():
+    global date_correct
+    if date_correct >= 4:
+        return "most"
+    else:
+        return "little"
+    
+def get_boss_score():
+    global boss_correct
+    if boss_correct >= 4:
+        return "most"
+    else:
+        return "little"
+

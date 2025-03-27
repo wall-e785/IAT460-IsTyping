@@ -1,11 +1,14 @@
 import random
 
-event = None
-friend_responded = -1
-
 events = {'e': ['poetry reading', 'project presentation', 'art showcase']}
 event = random.choice(events['e'])
-print(event)
+friend_responded = -1
+
+
+def choose_event():
+    global event, events
+    event = random.choice(events['e'])
+    print(event)
 
 friend_grammar1 = {
     #non-terminal symbols
@@ -122,7 +125,7 @@ you_grammar4 = {
 friend_grammar5 = {
     #non-terminal symbols
     'S-HIGH': [['HEY', 'the', event, 'is in', 'TIME', 'CHECKIN'], ['HEY', 'only', 'TIME', 'until the', event, 'COMING']],
-    'S-LOW': [['still drowning in indecision? or make a choice? lol', 'TIME', 'left til my', event], ['only', 'TIME', 'left...', 'soooo, u comin to the', event]],
+    'S-LOW': [['still drowning in indecision? or make a choice? lol', 'TIME', 'left til my', event, 'CHECKIN'], ['only', 'TIME', 'left...', 'soooo, u comin to the', event, 'CHECKIN']],
 
     #terminal symbols
     'HEY': ['hey!', 'ay!', 'hello!'],
