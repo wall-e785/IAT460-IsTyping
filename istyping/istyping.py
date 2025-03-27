@@ -10,6 +10,7 @@ import GrammarSets.preferences as preferences
 
 import Arduino.arduniohandler as Arduino
 import math
+import os
 #import time
 
 #referenced this for classes: https://www.w3schools.com/python/python_classes.asp
@@ -26,10 +27,17 @@ italic_font_path = pygame.font.match_font("sf pro", False, True)
 bold_italic_font_path = pygame.font.match_font("sf pro", True, True)
 h1 = pygame.font.Font(font_path, 32)
 h2 = pygame.font.Font(bold_italic_font_path, 48)
-h3 = pygame.font.Font(font_path, 20)
-h4 = pygame.font.Font(font_path, 17)
+h3 = pygame.font.Font(font_path, 30)
+h4 = pygame.font.Font(font_path, 25)
 transition_font = pygame.font.Font(bold_font_path, 175)
 name_header = pygame.font.Font(bold_font_path, 48)
+
+#set up sound, referenced from: https://opensource.com/article/20/9/add-sound-python-game
+pygame.mixer.init()
+button_click = pygame.mixer.Sound("istyping/sounds/button_click.mp3")
+receive_sound = pygame.mixer.Sound("istyping/sounds/receive_sound.mp3")
+sent_sound = pygame.mixer.Sound("istyping/sounds/sent_sound.mp3")
+transition_sound = pygame.mixer.Sound("istyping/sounds/transition_sound.mp3")
 
 #states for FSM
 MAIN = 0
@@ -51,7 +59,7 @@ currSpeaker = ""
 optionHigh = "Anxious Response!"
 optionNeu = "Neutral Response!"
 optionLow = "Lowkey Response!"
-MAX_TEXT_LENGTH = 41
+MAX_TEXT_LENGTH = 43
 
 HIGH = 0
 NEUTRAL = 1
@@ -81,6 +89,8 @@ class Button:
     #used to check mouse clicks by comparison bounding box and cursor position
     def checkMousePress(self, mouseX, mouseY):
         if mouseX > self.xPos and mouseX < self.xPos + self.width and mouseY > self.yPos and mouseY < self.yPos + self.height:
+            global button_click
+            pygame.mixer.Sound.play(button_click)
             return True
 
     #renders image onto the screen
@@ -116,6 +126,8 @@ class Fader:
                 if state == INTRO:
                     currScreen = TransitionScreen("Friend")
                     state = TRANSITION
+                    global transition_sound
+                    pygame.mixer.Sound.play(transition_sound)
                 elif state == TRANSITION:
                     global currSpeaker, countingdown
                     if currScreen.name == "Friend":
@@ -137,9 +149,11 @@ class Fader:
                 elif state == FRIEND:
                     currScreen = TransitionScreen("Date")
                     state = TRANSITION
+                    pygame.mixer.Sound.play(transition_sound)
                 elif state == DATE:
                     currScreen = TransitionScreen("Boss")
                     state = TRANSITION
+                    pygame.mixer.Sound.play(transition_sound)
                 elif state == BOSS:
                     state = FRIEND_END
                     currScreen = friendEndScreen()
@@ -190,6 +204,9 @@ class FriendScreen:
         global optionNeu
         global optionLow
 
+        global receive_sound
+        pygame.mixer.Sound.play(receive_sound)
+
         self.conversation = [
             grammar.generate('S', friend.friend_grammar1),
             grammar.generate('S', friend.you_grammar1),
@@ -239,6 +256,9 @@ class BossScreen:
         else:
             self.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar1)
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+        
+        global receive_sound
+        pygame.mixer.Sound.play(receive_sound)
 
         global optionHigh
         global optionNeu
@@ -342,10 +362,10 @@ def textScreen():
     HIGH_2LINES_Y = 326
     HIGH_1LINE_Y = 337
 
-    NEU_4LINES_Y = 435
-    NEU_3LINES_Y = 443
-    NEU_2LINES_Y = 455
-    NEU_1LINE_Y = 464
+    NEU_4LINES_Y = 433
+    NEU_3LINES_Y = 441
+    NEU_2LINES_Y = 453
+    NEU_1LINE_Y = 462
 
     LOW_4LINES_Y = 555
     LOW_3LINES_Y = 563
@@ -503,7 +523,7 @@ def textScreen():
 
     #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
-        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown, selected
+        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown, selected, receive_sound
         message_counter+=1
         countingdown = True
         grammar.processing = True
@@ -522,6 +542,7 @@ def textScreen():
                 optionNeu = currScreen.conversation[3] #grammar.generate('S', friend.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                pygame.mixer.Sound.play(receive_sound)
             elif(message_counter == 3):
                 currScreen.currMessage = currScreen.conversation[4] #grammar.generate('S', friend.friend_grammar3)
                 optionNeu = currScreen.conversation[5]#grammar.generate('S', friend.you_grammar3)
@@ -529,12 +550,15 @@ def textScreen():
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
 
                 friend.friend_responded = selected
+                pygame.mixer.Sound.play(receive_sound)
+
             elif(message_counter == 4):
                 currScreen.currMessage = currScreen.conversation[6]
 
                 optionNeu = currScreen.conversation[7]#grammar.generate('S', friend.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+                pygame.mixer.Sound.play(receive_sound)
 
                 # if preferences.friend_anxiousness >= 50:
                 #     currScreen.currMessage = grammar.generate('S-HIGH', friend.friend_grammar4)
@@ -550,11 +574,14 @@ def textScreen():
                 optionNeu = grammar.generate('S', date.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-
+                
                 if preferences.date_eagerness >= 50:
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar1)
                 else:
                     currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar1)
+
+                pygame.mixer.Sound.play(receive_sound)
+
             elif(message_counter == 3):
                 optionNeu = grammar.generate('S', date.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
@@ -564,6 +591,9 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar2)
                 else:
                     currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar2)
+                
+                pygame.mixer.Sound.play(receive_sound)
+
             elif(message_counter == 4):
                 optionNeu = grammar.generate('S', date.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
@@ -572,6 +602,7 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar3)
                 else:
                     currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar3)
+                pygame.mixer.Sound.play(receive_sound)
             else:
                 pygame.time.delay(3000)
                 message_counter = 1
@@ -586,6 +617,7 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar2)
                 else:
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar2)
+                pygame.mixer.Sound.play(receive_sound)
             elif(message_counter == 3):
                 if preferences.boss_professionalism >=50:
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar3)
@@ -594,7 +626,8 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar3)      
                     optionNeu = grammar.generate('S-CASUAL', boss.you_grammar3) 
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
-                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')     
+                optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')  
+                pygame.mixer.Sound.play(receive_sound)   
             elif(message_counter == 4):
                 boss.responded = selected
                 optionNeu = grammar.generate('S', boss.you_grammar4)
@@ -604,6 +637,7 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar4)
                 else:
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar4)
+                pygame.mixer.Sound.play(receive_sound)
             elif(message_counter == 5):
                 if boss.responded <=1:
                     optionNeu = grammar.generate('S-CARE', boss.you_grammar5)
@@ -622,6 +656,7 @@ def textScreen():
                         currScreen.currMessage = grammar.generate('S-CASUAL-CARE', boss.boss_grammar5)
                     else:
                         currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar5)
+                pygame.mixer.Sound.play(receive_sound)
             else:
                 pygame.time.delay(3000)
                 message_counter = 1
@@ -641,6 +676,8 @@ def textScreen():
                     arduino_countdown -= 1
                 else:
                     if not display_countingdown:
+                        global sent_sound
+                        pygame.mixer.Sound.play(sent_sound)
                         display_countingdown = True
                         if state == FRIEND or state == DATE:
                             if message_counter <= 4:
@@ -652,7 +689,7 @@ def textScreen():
                                     display_selected = optionNeu
                                 elif analogPrinter.data < 1/3:
                                     selected = LOW
-                                    display_selected = optionHigh
+                                    display_selected = optionLow
                             if state == FRIEND:
                                 preferences.check_friend(selected)
                             elif state == DATE:
@@ -698,14 +735,15 @@ def tutScreen():
             global run
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
-            pos = pygame.mouse.get_pos()
-            if(backButton.checkMousePress(pos[0], pos[1])):
-                state = MAIN
-                currScreen = HomeScreen()
-            elif(nextButton.checkMousePress(pos[0], pos[1])):
-                global fader
-                if fader.fading == None:
-                    fader.next()
+            global fader
+            if fader.fading == None:
+                pos = pygame.mouse.get_pos()
+                if(backButton.checkMousePress(pos[0], pos[1])):
+                    state = MAIN
+                    currScreen = HomeScreen()
+                elif(nextButton.checkMousePress(pos[0], pos[1])):
+                    if fader.fading == None:
+                        fader.next()
 
             
 def endScreen():
