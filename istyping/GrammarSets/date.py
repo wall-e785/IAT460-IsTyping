@@ -1,3 +1,5 @@
+#Generative Grammar Sets for the Date character
+
 you_grammar1 = {
     #non-terminal symbols
     'S': [['HELLO', ', I', 'WANT', 'CHECK', 'we are still', 'ON', 'LATER'], ['HELLO', 'POLITE', 'still', 'ON', 'LATER']],

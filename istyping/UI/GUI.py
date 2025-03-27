@@ -1,3 +1,4 @@
+#holds image assets
 import pygame
 
 high_indic = pygame.image.load("istyping/images/high_indic.jpg")

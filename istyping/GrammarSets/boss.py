@@ -1,3 +1,6 @@
+#Generative Grammar Sets for the Boss character
+
+#holds what type of message the user responded with, used to branch narrative in next message
 responded = -1
 
 boss_grammar1 = {

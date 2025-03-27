@@ -1,10 +1,15 @@
+#Generative Grammar Sets for the Friend character
+
 import random
 
+#keep track of which event was chosen to be used in different plot points
 events = {'e': ['poetry reading', 'project presentation', 'art showcase']}
 event = random.choice(events['e'])
+
+#keeps track of which message the user selected for branching points
 friend_responded = -1
 
-
+#method to choose an event
 def choose_event():
     global event, events
     event = random.choice(events['e'])

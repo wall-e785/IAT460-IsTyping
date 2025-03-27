@@ -1,4 +1,7 @@
-import pygame #used this video to review pygame basics: https://www.youtube.com/watch?v=y9VG3Pztok8
+#Main file to run to build this project.
+#Contains the core pygame loop, screens, and FSM states
+
+import pygame #used this video to review pygame basics and created foundation for project: https://www.youtube.com/watch?v=y9VG3Pztok8
 
 #referenced this link to import my own classes: https://csatlas.com/python-import-file-module/
 import UI.GUI as GUI
@@ -10,17 +13,15 @@ import GrammarSets.preferences as preferences
 
 import Arduino.arduniohandler as Arduino
 import math
-import os
-#import time
-
-#referenced this for classes: https://www.w3schools.com/python/python_classes.asp
 
 #initialize/setup pygame
 pygame.init()
 pygame.display.set_caption("is-typing")
 
-#intiliaze fonts
+#intilize fonts, referenced from: https://www.pygame.org/docs/ref/font.html
 pygame.font.init()
+
+#project created with sf pro and helvetica
 font_path = pygame.font.match_font("sf pro")
 bold_font_path = pygame.font.match_font("sf pro", True)
 italic_font_path = pygame.font.match_font("sf pro", False, True)
@@ -75,6 +76,8 @@ selected = -1
 #setup the window
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+
+#resized screen to try to improve resolution
 screen = pygame.display.set_mode((1920,1080))
 resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -82,6 +85,7 @@ window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 window.blit(resized_screen, (0,0))
 
 #button class, creates a button which has a visual component (rectangle) and text on top of it
+#reviewed python classes from: https://www.w3schools.com/python/python_classes.asp
 class Button:
     def __init__(self, xPos, yPos, width, height, image):
         self.xPos = xPos
@@ -112,6 +116,7 @@ class Fader:
         self.bg.set_alpha(self.alpha)
 
     def next(self):
+        #if the screen is not fading, start the fade out
         if not self.fading:
             self.fading = 'OUT'
             self.alpha = 0
@@ -123,9 +128,10 @@ class Fader:
             screen.blit(self.bg, (0,0))
 
     def update(self):
+        #while fading out, slowly increase alpha
         if self.fading == 'OUT':
             self.alpha += 3
-            if self.alpha >= 255:
+            if self.alpha >= 255: #once alpha reaches its max, complete the transition to next state/screen as needed
                 global state, currScreen
                 if state == INTRO:
                     currScreen = TransitionScreen("Friend")
@@ -167,8 +173,9 @@ class Fader:
                 elif state == FRIEND_END:
                     currScreen = EndScreen()
                     state = END
-                self.fading = 'IN'
+                self.fading = 'IN' #once transition is completed, start fading in
         else:
+            #fade in until 0 by decreasing alpha
             self.alpha -= 5
             if self.alpha <= 0:
                 self.fading = None  
@@ -176,7 +183,6 @@ class Fader:
   
 # create an instance for Arduino Board
 analogPrinter = Arduino.AnalogPrinter()
-
 analogPrinter.start()
 
 #setting up timer referenced from: https://gamedevacademy.org/pygame-timer-tutorial-complete-guide/
@@ -188,10 +194,10 @@ COUNTDOWN = 9
 arduino_countdown = COUNTDOWN
 countingdown = False
 
+#timer to keep the chosen responses on screen for a few seconds before next message
 DISPLAY_COUNTDOWN = 2
 display_countdown = DISPLAY_COUNTDOWN
 display_countingdown = False
-
 display_selected = None
 
 #homescreen class: holds UI for homescreen
@@ -214,6 +220,8 @@ class FriendScreen:
         global receive_sound
         pygame.mixer.Sound.play(receive_sound)
 
+        #generate a conversation 
+        #(this structure was only completed for the friend, as I initially thought of providing the following message to gemini as well)
         self.conversation = [
             grammar.generate('S', friend.friend_grammar1),
             grammar.generate('S', friend.you_grammar1),
@@ -223,6 +231,7 @@ class FriendScreen:
             grammar.generate('S', friend.you_grammar3),
         ]
 
+        #choose the right response depending on the friend's anxiousness characteristic
         if preferences.friend_anxiousness >= 50:
             self.conversation.append(grammar.generate('S-HIGH', friend.friend_grammar4))
         else:    
@@ -230,6 +239,7 @@ class FriendScreen:
         
         self.conversation.append(grammar.generate('S', friend.you_grammar4))
 
+        #setup the first messages to display
         self.currMessage = self.conversation[0]
         grammar.processing = True
         optionNeu = self.conversation[1]
@@ -247,6 +257,7 @@ class DateScreen:
         global optionNeu
         global optionLow
 
+        #setup the first messages to display
         grammar.processing = True
         optionNeu = grammar.generate('S', date.you_grammar1)
         optionHigh = grammar.get_prompt(self.currMessage, optionNeu, 'date', 'HIGH')
@@ -258,6 +269,7 @@ class BossScreen:
         self.name = "BOSS"
         self.currMessage = None
 
+        #set up the first messages to display, based on the boss' professionalism characteristic
         if preferences.boss_professionalism >=50:
             self.currMessage = grammar.generate('S-PROF', boss.boss_grammar1)
         else:
@@ -289,25 +301,30 @@ class EndScreen:
         self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
         self.bg = pygame.image.load("istyping/images/end_bg.jpg")
 
+#creditscreen class: holds UI for credit sscreen to show credits
 class CreditScreen:
     def __init__(self):
         self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
         self.bg = pygame.image.load("istyping/images/credits.jpg")
 
+#transitionscreen class: holds UI for transitions between the characters to introduce them
 class TransitionScreen:
     def __init__ (self, name):
         self.bg = pygame.image.load("istyping/images/transition_bg.jpg")
         self.name = name
 
+#friendendscreen class: holds UI for the final message from the friend before the end screen
 class FriendEndScreen:
     def __init__ (self):
         self.messageimg = pygame.image.load("istyping/images/friend_final_text.jpg")
         self.yPos = SCREEN_HEIGHT
         self.alpha = 0
+        #generate the message based on friend's characteristic
         if preferences.friend_anxiousness >= 50:
             self.text = grammar.generate('S-HIGH', friend.friend_grammar5)
         else:
             self.text = grammar.generate('S-LOW', friend.friend_grammar5)
+
 #setup current screen, used to keep track alongside current state what is showing
 currScreen = HomeScreen()
 fader = Fader()
@@ -324,8 +341,6 @@ def mainLoop():
     aboutButton = currScreen.aboutButton 
     startButton.draw()
     aboutButton.draw()
-
-
 
     pygame.display.flip()
 
@@ -352,6 +367,8 @@ def textScreen():
     screen.fill((255,255,255))
     screen.blit(currScreen.bg.convert(), (0,0))
 
+    #draw the visuals for the other speaker as needed 
+    # (don't draw if it is the date's first message, which appears AFTER the user's first text)
     if state != DATE:
         screen.blit(GUI.profile_icon.convert(), (38,216))
         screen.blit(GUI.text_them.convert(), (155,151))
@@ -359,13 +376,13 @@ def textScreen():
         if message_counter != 1:
             screen.blit(GUI.profile_icon.convert(), (38,216))
             screen.blit(GUI.text_them.convert(), (155,151))
-        
-    screen.blit(GUI.profile_icon.convert(), (1143,595))
 
+    screen.blit(GUI.profile_icon.convert(), (1143,595))
 
     #set up the three text options and draw them
     global optionHigh, optionNeu, optionLow, arduino_countdown, display_countingdown
 
+    #if the user is currently choosing a message, display an indicator for which message their pressure corresponds to
     if not display_countingdown:
         if analogPrinter.data > (1/3)*2:
             screen.blit(GUI.high_indic.convert(), (593,313))
@@ -377,6 +394,7 @@ def textScreen():
             screen.blit(GUI.low_indic.convert(), (593,562))
 
     #y-positions of the start of the text box depending on how many lines there are
+    #pygame does not support multi-line text, so these variables are used to properly create paragraphs blocks
     HIGH_4LINES_Y = 304
     HIGH_3LINES_Y = 314
     HIGH_2LINES_Y = 326
@@ -402,12 +420,15 @@ def textScreen():
     low_num_lines = None
     them_num_lines = None
 
+    #format the texts to see how many lines are required
     global MAX_TEXT_LENGTH
     formattedHigh = grammar.format_text(optionHigh, MAX_TEXT_LENGTH)
     formattedNeu = grammar.format_text(optionNeu, MAX_TEXT_LENGTH)
     formattedLow = grammar.format_text(optionLow, MAX_TEXT_LENGTH)
     formattedThem = grammar.format_text(currScreen.currMessage, MAX_TEXT_LENGTH)
 
+    #this displays the selected text after the countdown is over
+    #displays a solid green text bubble, and the user's selected message
     global display_selected
     if not display_countingdown:
         screen.blit(GUI.thinking_you.convert(), (684,289))
@@ -440,8 +461,10 @@ def textScreen():
                 screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
 
 
-    #for each of the options, check how many lines they need
+    #for each of the options, check how many lines they need and display as needed
     if not display_countingdown:
+
+        #high option
         if len(formattedHigh) == 4:
             high_num_lines = HIGH_4LINES_Y
             screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
@@ -464,6 +487,7 @@ def textScreen():
             high_num_lines = HIGH_1LINE_Y 
             screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
+        #neutral option
         if len(formattedNeu) == 4:
             neu_num_lines = NEU_4LINES_Y
             screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
@@ -486,6 +510,7 @@ def textScreen():
             neu_num_lines = NEU_1LINE_Y
             screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
 
+        #low option
         if len(formattedLow) == 4:
             low_num_lines = LOW_4LINES_Y
             screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
@@ -508,6 +533,7 @@ def textScreen():
             low_num_lines = LOW_1LINE_Y
             screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
     
+    #the other person's text
     if len(formattedThem) == 4: #3 lines
         them_num_lines = THEM_4LINES_Y
         screen.blit(h4.render(formattedThem[0], True, (0,0,0)), (215, them_num_lines))
@@ -537,7 +563,7 @@ def textScreen():
                 
 
 
-    #rendering the speaker's message
+    #rendering the countdown and the other person's name
     screen.blit(name_header.render(currSpeaker, True, (0,0,0)), (575, 24))
     if not display_countingdown:
         screen.blit(h2.render(str(arduino_countdown), True, (0,0,0)), (875, 215))
@@ -551,13 +577,17 @@ def textScreen():
     #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
         global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown, selected, receive_sound
+        #update the current message in the conversation and start counting down
         message_counter+=1
         countingdown = True
+
+        #processing is used to limit the calls to the gemini api, so it is not called repeatedly
         grammar.processing = True
 
         #generate messages depending on the current speaker, and determine the set based on the message number
         if state == FRIEND:
             if(message_counter == 2):
+                #branch: if the user selected a high message, generate a different variation of the friend's message
                 if selected == HIGH:
                     if preferences.friend_anxiousness>=50:
                         currScreen.conversation[2] = grammar.generate('S-HIGH-GOOD', friend.friend_grammar2)
@@ -602,6 +632,7 @@ def textScreen():
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
                 
+                #branch: if the date is eager, generate a different variation of the date's message
                 if preferences.date_eagerness >= 50:
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar1)
                 else:
@@ -613,7 +644,8 @@ def textScreen():
                 optionNeu = grammar.generate('S', date.you_grammar3)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
-
+                    
+                #branch: if the date is eager, generate a different variation of the date's message
                 if preferences.date_eagerness >= 50:
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar2)
                 else:
@@ -625,6 +657,8 @@ def textScreen():
                 optionNeu = grammar.generate('S', date.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+
+                #branch: if the date is eager, generate a different variation of the date's message
                 if preferences.date_eagerness >= 50:
                     currScreen.currMessage = grammar.generate('S-EAGER', date.date_grammar3)
                 else:
@@ -640,12 +674,16 @@ def textScreen():
                 optionNeu = grammar.generate('S', boss.you_grammar2)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+
+                #branch: if the boss is professional, generate a different variation of the boss's message
                 if preferences.boss_professionalism >=50:
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar2)
                 else:
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar2)
                 pygame.mixer.Sound.play(receive_sound)
             elif(message_counter == 3):
+
+                #branch: if the boss is professional, generate a different variation of the boss's message
                 if preferences.boss_professionalism >=50:
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar3)
                     optionNeu = grammar.generate('S-PROF', boss.you_grammar3)
@@ -660,12 +698,16 @@ def textScreen():
                 optionNeu = grammar.generate('S', boss.you_grammar4)
                 optionHigh = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'HIGH')
                 optionLow = grammar.get_prompt(currScreen.currMessage, optionNeu, currSpeaker, 'LOW')
+
+                #branch: if the boss is professional, generate a different variation of the boss's message
                 if preferences.boss_professionalism >=50:
                     currScreen.currMessage = grammar.generate('S-PROF', boss.boss_grammar4)
                 else:
                     currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar4)
                 pygame.mixer.Sound.play(receive_sound)
             elif(message_counter == 5):
+
+                #branch: depending on the user's message choice, generate a different variation of the boss's message
                 if boss.responded <=1:
                     optionNeu = grammar.generate('S-CARE', boss.you_grammar5)
                 else:
@@ -695,9 +737,10 @@ def textScreen():
         if event.type == pygame.QUIT: #exit button
            global run
            run = False
-        elif event.type == TIMEREVENT:
+        elif event.type == TIMEREVENT: #called each 1000ms (1s)
             global countingdown, display_countdown, selected
 
+            #counting down for time to select message
             if countingdown:
                 if arduino_countdown > 0:
                     arduino_countdown -= 1
@@ -708,6 +751,8 @@ def textScreen():
                     if not display_countingdown:
                         global sent_sound
                         pygame.mixer.Sound.play(sent_sound)
+
+                        #saving which message was selected, add it to the user's performance calculation
                         display_countingdown = True
                         if state == FRIEND or state == DATE:
                             if message_counter <= 4:
@@ -737,7 +782,7 @@ def textScreen():
                                     display_selected = optionLow
                                 preferences.check_boss(selected)
                     elif display_countingdown and display_countdown > 0:
-                        display_countdown -=1
+                        display_countdown -=1 #show the selected message for a few seconds
                     else:
                         arduino_countdown = COUNTDOWN 
                         countingdown = False
@@ -748,7 +793,9 @@ def textScreen():
                         if state == FRIEND or state == DATE or state == BOSS:
                             if fader.fading == None:
                                 get_messages()
-                        print(selected)   
+                        print(selected)  
+
+#ADD COMMENTS FROM HERE 
 def tutScreen():
     screen.fill((255,255,255))
     
