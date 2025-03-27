@@ -167,6 +167,12 @@ COUNTDOWN = 9
 arduino_countdown = COUNTDOWN
 countingdown = False
 
+DISPLAY_COUNTDOWN = 2
+display_countdown = DISPLAY_COUNTDOWN
+display_countingdown = False
+
+display_selected = None
+
 #homescreen class: holds UI for homescreen
 class HomeScreen:
     def __init__(self):
@@ -318,31 +324,17 @@ def textScreen():
 
 
     #set up the three text options and draw them
-    global optionHigh, optionNeu, optionLow, arduino_countdown
+    global optionHigh, optionNeu, optionLow, arduino_countdown, display_countingdown
 
-    # posButton = currScreen.posButton
-    # neuButton = currScreen.neuButton
-    # negButton = currScreen.negButton
+    if not display_countingdown:
+        if analogPrinter.data > (1/3)*2:
+            screen.blit(GUI.high_indic.convert(), (593,313))
 
-    # posButton.draw()
-    # neuButton.draw()
-    # negButton.draw()
-    #(posButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
-    #(neuButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
-    # (negButton.checkMousePress(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) or
+        if (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+            screen.blit(GUI.neutral_indic.convert(), (593,441))
 
-    if analogPrinter.data > (1/3)*2:
-        screen.blit(GUI.high_indic.convert(), (593,313))
-
-    if (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
-        screen.blit(GUI.neutral_indic.convert(), (593,441))
-
-    if  analogPrinter.data < 1/3:
-        screen.blit(GUI.low_indic.convert(), (593,562))
-
-    screen.blit(GUI.thinking_you.convert(), (684,289))
-    screen.blit(GUI.thinking_you.convert(), (684,417))
-    screen.blit(GUI.thinking_you.convert(), (684,539))
+        if  analogPrinter.data < 1/3:
+            screen.blit(GUI.low_indic.convert(), (593,562))
 
     #y-positions of the start of the text box depending on how many lines there are
     HIGH_4LINES_Y = 304
@@ -376,72 +368,105 @@ def textScreen():
     formattedLow = grammar.format_text(optionLow, MAX_TEXT_LENGTH)
     formattedThem = grammar.format_text(currScreen.currMessage, MAX_TEXT_LENGTH)
 
+    global display_selected
+    if not display_countingdown:
+        screen.blit(GUI.thinking_you.convert(), (684,289))
+        screen.blit(GUI.thinking_you.convert(), (684,417))
+        screen.blit(GUI.thinking_you.convert(), (684,539))
+    else:
+        screen.blit(GUI.text_you.convert(), (684,539))
+        if display_selected != None:
+            formatted_selected = grammar.format_text(display_selected, MAX_TEXT_LENGTH)
+            if len(formatted_selected) == 4:
+                low_num_lines = LOW_4LINES_Y
+                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+21))
+                screen.blit(h4.render(formatted_selected[2], True, (0,0,0)), (708, low_num_lines+42))
+                screen.blit(h4.render(formatted_selected[3], True, (0,0,0)), (708, low_num_lines+63))
+            elif len(formatted_selected) == 3: #3 lines
+                low_num_lines = LOW_3LINES_Y
+                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+24))
+                screen.blit(h4.render(formatted_selected[2], True, (0,0,0)), (708, low_num_lines+48))
+            elif len(formatted_selected) == 2: #2 lines
+                low_num_lines = LOW_2LINES_Y
+                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+24))
+            elif len(formattedLow) == 1: #1 line
+                low_num_lines = LOW_1LINE_Y
+                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
+            else:
+                low_num_lines = LOW_1LINE_Y
+                screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
+
+
     #for each of the options, check how many lines they need
-    if len(formattedHigh) == 4:
-        high_num_lines = HIGH_4LINES_Y
-        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+21))
-        screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+42))
-        screen.blit(h4.render(formattedHigh[3], True, (0,0,0)), (708, high_num_lines+63))
-    elif len(formattedHigh) == 3: #3 lines
-        high_num_lines = HIGH_3LINES_Y
-        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
-        screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+48))
-    elif len(formattedHigh) == 2: #2 lines
-        high_num_lines = HIGH_2LINES_Y
-        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-        screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
-    elif len(formattedHigh) == 1: #1 line
-        high_num_lines = HIGH_1LINE_Y 
-        screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
-    else:
-        high_num_lines = HIGH_1LINE_Y 
-        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
+    if not display_countingdown:
+        if len(formattedHigh) == 4:
+            high_num_lines = HIGH_4LINES_Y
+            screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+            screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+21))
+            screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+42))
+            screen.blit(h4.render(formattedHigh[3], True, (0,0,0)), (708, high_num_lines+63))
+        elif len(formattedHigh) == 3: #3 lines
+            high_num_lines = HIGH_3LINES_Y
+            screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+            screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+            screen.blit(h4.render(formattedHigh[2], True, (0,0,0)), (708, high_num_lines+48))
+        elif len(formattedHigh) == 2: #2 lines
+            high_num_lines = HIGH_2LINES_Y
+            screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+            screen.blit(h4.render(formattedHigh[1], True, (0,0,0)), (708, high_num_lines+24))
+        elif len(formattedHigh) == 1: #1 line
+            high_num_lines = HIGH_1LINE_Y 
+            screen.blit(h4.render(formattedHigh[0], True, (0,0,0)), (708, high_num_lines))
+        else:
+            high_num_lines = HIGH_1LINE_Y 
+            screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, high_num_lines))
 
-    if len(formattedNeu) == 4:
-        neu_num_lines = NEU_4LINES_Y
-        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+21))
-        screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+42))
-        screen.blit(h4.render(formattedNeu[3], True, (0,0,0)), (708, neu_num_lines+63))
-    elif len(formattedNeu) == 3: #3 lines
-        neu_num_lines = NEU_3LINES_Y
-        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
-        screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+48))
-    elif len(formattedNeu) == 2: #2 lines
-        neu_num_lines = NEU_2LINES_Y
-        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-        screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
-    elif len(formattedNeu) == 1: #1 line
-        neu_num_lines = NEU_1LINE_Y
-        screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
-    else:
-        neu_num_lines = NEU_1LINE_Y
-        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
+        if len(formattedNeu) == 4:
+            neu_num_lines = NEU_4LINES_Y
+            screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+            screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+21))
+            screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+42))
+            screen.blit(h4.render(formattedNeu[3], True, (0,0,0)), (708, neu_num_lines+63))
+        elif len(formattedNeu) == 3: #3 lines
+            neu_num_lines = NEU_3LINES_Y
+            screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+            screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+            screen.blit(h4.render(formattedNeu[2], True, (0,0,0)), (708, neu_num_lines+48))
+        elif len(formattedNeu) == 2: #2 lines
+            neu_num_lines = NEU_2LINES_Y
+            screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+            screen.blit(h4.render(formattedNeu[1], True, (0,0,0)), (708, neu_num_lines+24))
+        elif len(formattedNeu) == 1: #1 line
+            neu_num_lines = NEU_1LINE_Y
+            screen.blit(h4.render(formattedNeu[0], True, (0,0,0)), (708, neu_num_lines))
+        else:
+            neu_num_lines = NEU_1LINE_Y
+            screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, neu_num_lines))
 
-    if len(formattedLow) == 4:
-        low_num_lines = LOW_4LINES_Y
-        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+21))
-        screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+42))
-        screen.blit(h4.render(formattedLow[3], True, (0,0,0)), (708, low_num_lines+63))
-    elif len(formattedLow) == 3: #3 lines
-        low_num_lines = LOW_3LINES_Y
-        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
-        screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+48))
-    elif len(formattedLow) == 2: #2 lines
-        low_num_lines = LOW_2LINES_Y
-        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-        screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
-    elif len(formattedLow) == 1: #1 line
-        low_num_lines = LOW_1LINE_Y
-        screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
-    else:
-        low_num_lines = LOW_1LINE_Y
-        screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
+        if len(formattedLow) == 4:
+            low_num_lines = LOW_4LINES_Y
+            screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+            screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+21))
+            screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+42))
+            screen.blit(h4.render(formattedLow[3], True, (0,0,0)), (708, low_num_lines+63))
+        elif len(formattedLow) == 3: #3 lines
+            low_num_lines = LOW_3LINES_Y
+            screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+            screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+            screen.blit(h4.render(formattedLow[2], True, (0,0,0)), (708, low_num_lines+48))
+        elif len(formattedLow) == 2: #2 lines
+            low_num_lines = LOW_2LINES_Y
+            screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+            screen.blit(h4.render(formattedLow[1], True, (0,0,0)), (708, low_num_lines+24))
+        elif len(formattedLow) == 1: #1 line
+            low_num_lines = LOW_1LINE_Y
+            screen.blit(h4.render(formattedLow[0], True, (0,0,0)), (708, low_num_lines))
+        else:
+            low_num_lines = LOW_1LINE_Y
+            screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
 
     if len(formattedThem) == 4: #3 lines
         them_num_lines = THEM_4LINES_Y
@@ -478,7 +503,7 @@ def textScreen():
 
     #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
-        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown
+        global message_counter, optionNeu, optionHigh, optionLow, state, currScreen, currSpeaker, arduino_countdown, countingdown, selected
         message_counter+=1
         countingdown = True
         grammar.processing = True
@@ -609,41 +634,54 @@ def textScreen():
            global run
            run = False
         elif event.type == TIMEREVENT:
-            global countingdown
+            global countingdown, display_countdown, selected
 
             if countingdown:
                 if arduino_countdown > 0:
                     arduino_countdown -= 1
                 else:
-                    arduino_countdown = COUNTDOWN 
-                    countingdown = False
+                    if not display_countingdown:
+                        display_countingdown = True
+                        if state == FRIEND or state == DATE:
+                            if message_counter <= 4:
+                                if analogPrinter.data > (1/3)*2:
+                                    selected = HIGH
+                                    display_selected = optionHigh
+                                elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+                                    selected = NEUTRAL
+                                    display_selected = optionNeu
+                                elif analogPrinter.data < 1/3:
+                                    selected = LOW
+                                    display_selected = optionHigh
+                            if state == FRIEND:
+                                preferences.check_friend(selected)
+                            elif state == DATE:
+                                preferences.check_date(selected)
+                        elif state == BOSS:
+                            if message_counter <= 5:
+                                if analogPrinter.data > (1/3)*2:
+                                    selected = HIGH
+                                    display_selected = optionHigh
+                                elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
+                                    selected = NEUTRAL
+                                    display_selected = optionNeu
+                                elif analogPrinter.data < 1/3:
+                                    selected = LOW
+                                    display_selected = optionLow
+                                preferences.check_boss(selected)
+                    elif display_countingdown and display_countdown > 0:
+                        display_countdown -=1
+                    else:
+                        arduino_countdown = COUNTDOWN 
+                        countingdown = False
+                        display_countingdown = False
+                        display_countdown = DISPLAY_COUNTDOWN
+                        display_selected = None
 
-                    if state == FRIEND or state == DATE:
-                        if message_counter <= 4:
-                            if analogPrinter.data > (1/3)*2:
-                                selected = HIGH
-                            elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
-                                selected = NEUTRAL
-                            elif analogPrinter.data < 1/3:
-                                selected = LOW
-                        if state == FRIEND:
-                            preferences.check_friend(selected)
-                        elif state == DATE:
-                            preferences.check_date(selected)
-                        if fader.fading == None:
-                            get_messages()
-                    elif state == BOSS:
-                        if message_counter <= 5:
-                            if analogPrinter.data > (1/3)*2:
-                                selected = HIGH
-                            elif (analogPrinter.data >= 1/3 and analogPrinter.data <= (1/3)*2):
-                                selected = NEUTRAL
-                            elif analogPrinter.data < 1/3:
-                                selected = LOW
-                            preferences.check_boss(selected)
-                        if fader.fading == None:
-                            get_messages()
-                    print(selected)   
+                        if state == FRIEND or state == DATE or state == BOSS:
+                            if fader.fading == None:
+                                get_messages()
+                        print(selected)   
 def tutScreen():
     screen.fill((255,255,255))
 
