@@ -40,6 +40,7 @@ button_click = pygame.mixer.Sound("istyping/sounds/button_click.mp3")
 receive_sound = pygame.mixer.Sound("istyping/sounds/receive_sound.mp3")
 sent_sound = pygame.mixer.Sound("istyping/sounds/sent_sound.mp3")
 transition_sound = pygame.mixer.Sound("istyping/sounds/transition_sound.mp3")
+countdown_tick = pygame.mixer.Sound("istyping/sounds/countdown_tick.mp3")
 
 #states for FSM
 MAIN = 0
@@ -50,6 +51,7 @@ BOSS = 4
 END = 5
 TRANSITION = 6
 FRIEND_END = 7
+CREDITS = 8
 
 state = MAIN
 run = True
@@ -287,6 +289,11 @@ class EndScreen:
         self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
         self.bg = pygame.image.load("istyping/images/end_bg.jpg")
 
+class CreditScreen:
+    def __init__(self):
+        self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
+        self.bg = pygame.image.load("istyping/images/credits.jpg")
+
 class TransitionScreen:
     def __init__ (self, name):
         self.bg = pygame.image.load("istyping/images/transition_bg.jpg")
@@ -337,6 +344,8 @@ def mainLoop():
                 state = INTRO
             elif(aboutButton.checkMousePress(pos[0], pos[1])):
                 print("about!")  
+                currScreen = CreditScreen()
+                state = CREDITS
 
 #text loop - used by the friend, date and boss screens to draw the UI
 def textScreen():
@@ -692,6 +701,9 @@ def textScreen():
             if countingdown:
                 if arduino_countdown > 0:
                     arduino_countdown -= 1
+                    if arduino_countdown < 3:
+                        global countdown_tick
+                        pygame.mixer.Sound.play(countdown_tick)
                 else:
                     if not display_countingdown:
                         global sent_sound
@@ -791,6 +803,29 @@ def endScreen():
             if(homeButton.checkMousePress(pos[0], pos[1])):
                 state = MAIN
                 currScreen = HomeScreen()
+
+def creditsLoop():
+    screen.fill((255,255,255))
+    
+    global currScreen, state
+
+    screen.blit(currScreen.bg.convert(), (0,0))
+
+    homeButton = currScreen.homeButton
+
+    homeButton.draw()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: #exit button
+            global run
+            run = False
+        elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
+            global fader
+            if fader.fading == None:
+                pos = pygame.mouse.get_pos()
+                if(homeButton.checkMousePress(pos[0], pos[1])):
+                    state = MAIN
+                    currScreen = HomeScreen()
 
 alpha = 0
 name_pos = -200
@@ -907,6 +942,8 @@ while run:
         transitionLoop()
     elif state == FRIEND_END:
         friendEndLoop()
+    elif state == CREDITS:
+        creditsLoop()
 
 
     #pygame.draw.rect(screen, (0,255,0), player)
