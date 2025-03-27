@@ -16,7 +16,7 @@ You will also need wires, a pressure sensor, and a 10k ohm resistor. Create the 
 A 10G-5KG (1" Area) Force Pressure Sensor (exact model shown below) was used to gather input for this project. To learn more about Force Pressure Sensors (FSR), read here: https://learn.adafruit.com/force-sensitive-resistor-fsr/overview 
 <img width="343" alt="Screenshot 2025-03-27 at 12 56 26 PM" src="https://github.com/user-attachments/assets/d33d41bd-5aa3-469f-9634-bd80653ae418" />
 
-In Arduino, figure out which port the board is connected to. Copy and paste this to Arduino -> arduinotest.py, line 7 so the data can be sent to the python program.
+In Arduino, figure out which port the board is connected to. Copy and paste this to file in folder: Arduino -> arduinohandler.py, line 9 so the data can be sent to the python program.
 
 A Google Gemini API key is also required; find more information here: https://aistudio.google.com/
 Once you have an API key, create a file in the main hierarchy called .env
@@ -25,7 +25,7 @@ On a single line, enter: GEMINI_KEY = "<YOUR KEY HERE>" for the other files to a
 Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
 
 # Credits:
-Created by Wallace Chau
+Created by Wallace Chau (developer, graphics, generative grammar sets)
 
 Special thanks to Tino de Bruijn and Bernd Porr for creating pyfirmata2: https://github.com/berndporr/pyFirmata2
 
