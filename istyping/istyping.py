@@ -795,14 +795,16 @@ def textScreen():
                                 get_messages()
                         print(selected)  
 
-#ADD COMMENTS FROM HERE 
+#tutorial screen loop - displays the tutorial + buttons
 def tutScreen():
     screen.fill((255,255,255))
     
     global currScreen, state
 
+    #draw background
     screen.blit(currScreen.bg.convert(), (0,0))
 
+    #draw buttons
     backButton = currScreen.backButton
     nextButton = currScreen.nextButton
 
@@ -816,6 +818,7 @@ def tutScreen():
         elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
             global fader
             if fader.fading == None:
+                #navigate to next screen based on button pressed
                 pos = pygame.mouse.get_pos()
                 if(backButton.checkMousePress(pos[0], pos[1])):
                     state = MAIN
@@ -824,17 +827,19 @@ def tutScreen():
                     if fader.fading == None:
                         fader.next()
 
-            
+#handles the end screen, showing the user's performance and character's preferences      
 def endScreen():
     screen.fill((255,255,255))
 
     global currScreen, state
 
+    #draw UI
     screen.blit(currScreen.bg, (0,0))
     homeButton = currScreen.homeButton
 
     homeButton.draw()
 
+    #write each of the preferences + user's performance in simple language
     screen.blit(h3.render("The friend...", True, (0,0,0)), (279, 310))
     screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (410, 310))
     screen.blit(h3.render("The date...", True, (0,0,0)), (279, 345))
@@ -847,15 +852,18 @@ def endScreen():
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN: #mouse click
             pos = pygame.mouse.get_pos()
+            #return home
             if(homeButton.checkMousePress(pos[0], pos[1])):
                 state = MAIN
                 currScreen = HomeScreen()
 
+#credits screen, accessible from home page
 def creditsLoop():
     screen.fill((255,255,255))
     
     global currScreen, state
 
+    #draw background and button
     screen.blit(currScreen.bg.convert(), (0,0))
 
     homeButton = currScreen.homeButton
@@ -870,22 +878,27 @@ def creditsLoop():
             global fader
             if fader.fading == None:
                 pos = pygame.mouse.get_pos()
+                #return home
                 if(homeButton.checkMousePress(pos[0], pos[1])):
                     state = MAIN
                     currScreen = HomeScreen()
 
+# global variables to keep track of current state of the transition screen
 alpha = 0
 name_pos = -200
 showName = False
 done = False
 stay_on_screen = 4
 
+#used to draw the transition screens which introduce the next character
 def transitionLoop():
     screen.fill((255,255,255))
 
     global currScreen, alpha, showName, name_pos, done, stay_on_screen 
     #referenced transparency from: https://www.youtube.com/watch?v=8_HVdxBqJmE
     bg = currScreen.bg.copy()
+
+    #fade in the background
     if alpha < 255 and not done:
         alpha+=10
     else:
@@ -894,14 +907,16 @@ def transitionLoop():
     bg.set_alpha(alpha)
     screen.blit(bg, (0,0))
 
+    #translate the name from left->center of screen
     if showName:
         if name_pos < 450:
             name_pos+=15
         else:
             showName = False
             done = True   
-        screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
+            screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
 
+    #resetting variables once the countdown is over
     if stay_on_screen == 0:
         alpha = 0
         name_pos = -200
@@ -914,16 +929,22 @@ def transitionLoop():
         if event.type == pygame.QUIT: #exit the window
             global run
             run = False 
-        elif event.type == TIMEREVENT:
+        elif event.type == TIMEREVENT: #runs every 1000ms (1s)
+            #once the transition is shown, fade to next scene
             if fader.fading == None and stay_on_screen < 4:
                 fader.next()
+            #countdown of duration to display the completed animation on screen
             if done and stay_on_screen > 0:
                 stay_on_screen -= 1
 
+#global variable for duration of displaying the friend's last text screen
 stay_on_screen2 = 10
+
+#friend end loop shows a short animation to wrap up the narrative, of the friend's last check-in text.
 def friendEndLoop():
     screen.fill((255,255,255))
 
+    #animate the message background upwards and fading in
     global currScreen, stay_on_screen2
     if currScreen.yPos > 253:
         currScreen.yPos-=10
@@ -936,11 +957,13 @@ def friendEndLoop():
     currScreen.messageimg.set_alpha(currScreen.alpha)
     screen.blit(currScreen.messageimg, (265,currScreen.yPos))
 
+    #format the text message to fit in the notification popup
     START_POINT = 327
     MAX_LENGTH = 37
 
     formatted_message = grammar.format_text(currScreen.text, MAX_LENGTH)
 
+    #display the text based on the number of lines required
     if currScreen.yPos >=253 and currScreen.alpha > 25:
         if len(formatted_message) == 3: #3 lines
             screen.blit(h1.render(formatted_message[0], True, (0,0,0)), (495, START_POINT))
@@ -963,15 +986,19 @@ def friendEndLoop():
             global run
             run = False 
         elif event.type == TIMEREVENT:
+            #once the animation is done displaying, start fading to next screen
             if fader.fading == None and stay_on_screen2 < 4:
                 fader.next()
+            #counting down the duration to stay on screen
             if stay_on_screen2 > 0:
                 stay_on_screen2 -= 1
           
 
 #core loop to run the program
 while run:
+    #short delay so system isn't overwhelmed
     pygame.time.delay(10)
+
     #show current screen based on state
     if state == MAIN:
         mainLoop()
@@ -992,14 +1019,13 @@ while run:
     elif state == CREDITS:
         creditsLoop()
 
-
-    #pygame.draw.rect(screen, (0,255,0), player)
-    #key = pygame.key.get_pressed()
+    #used to control the fade-to-black object
     if fader.fading != None:
         fader.draw()
+
     #updates screen to display objects
     pygame.display.update()
     
-#exits window once the run loop ends
+#exits window once the run loop ends, stopping arduino reads and quitting pygame window
 analogPrinter.stop()
 pygame.quit()
