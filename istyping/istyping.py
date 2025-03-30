@@ -34,6 +34,7 @@ h5 = pygame.font.Font(font_path, 30)
 
 transition_font = pygame.font.Font(bold_font_path, 175)
 name_header = pygame.font.Font(bold_font_path, 90)
+prompt_font = pygame.font.Font(bold_font_path, 100)
 
 #set up sound, referenced from: https://opensource.com/article/20/9/add-sound-python-game
 pygame.mixer.init()
@@ -219,6 +220,7 @@ class FriendScreen:
     def __init__(self):
         self.name = "FRIEND"
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+        self.prompt = pygame.image.load("istyping/images/prompt.jpg")
 
         global optionHigh
         global optionNeu
@@ -259,6 +261,7 @@ class DateScreen:
         self.name = "DATE"
         self.currMessage = ""
         self.bg = pygame.image.load("istyping/images/text_screen_bg.jpg")
+        self.prompt = pygame.image.load("istyping/images/prompt.jpg")
 
         global optionHigh
         global optionNeu
@@ -275,6 +278,7 @@ class BossScreen:
     def __init__(self):
         self.name = "BOSS"
         self.currMessage = None
+        self.prompt = pygame.image.load("istyping/images/prompt.jpg")
 
         #set up the first messages to display, based on the boss' professionalism characteristic
         if preferences.boss_professionalism >=50:
@@ -370,6 +374,7 @@ def mainLoop():
                 state = CREDITS
 
 #text loop - used by the friend, date and boss screens to draw the UI
+dotcount = 1
 def textScreen():
     screen.fill((255,255,255))
     screen.blit(currScreen.bg.convert(), (0,0))
@@ -447,25 +452,25 @@ def textScreen():
             formatted_selected = grammar.format_text(display_selected, MAX_TEXT_LENGTH)
             if len(formatted_selected) == 4:
                 low_num_lines = LOW_4LINES_Y
-                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
-                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+21))
-                screen.blit(h4.render(formatted_selected[2], True, (0,0,0)), (708, low_num_lines+42))
-                screen.blit(h4.render(formatted_selected[3], True, (0,0,0)), (708, low_num_lines+63))
+                screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (255,255,255)), (708, low_num_lines+21))
+                screen.blit(h4.render(formatted_selected[2], True, (255,255,255)), (708, low_num_lines+42))
+                screen.blit(h4.render(formatted_selected[3], True, (255,255,255)), (708, low_num_lines+63))
             elif len(formatted_selected) == 3: #3 lines
                 low_num_lines = LOW_3LINES_Y
-                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
-                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+24))
-                screen.blit(h4.render(formatted_selected[2], True, (0,0,0)), (708, low_num_lines+48))
+                screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (255,255,255)), (708, low_num_lines+24))
+                screen.blit(h4.render(formatted_selected[2], True, (255,255,255)), (708, low_num_lines+48))
             elif len(formatted_selected) == 2: #2 lines
                 low_num_lines = LOW_2LINES_Y
-                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
-                screen.blit(h4.render(formatted_selected[1], True, (0,0,0)), (708, low_num_lines+24))
+                screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[1], True, (255,255,255)), (708, low_num_lines+24))
             elif len(formattedLow) == 1: #1 line
                 low_num_lines = LOW_1LINE_Y
-                screen.blit(h4.render(formatted_selected[0], True, (0,0,0)), (708, low_num_lines))
+                screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
             else:
                 low_num_lines = LOW_1LINE_Y
-                screen.blit(h4.render("Error: Line Too Long", True, (0,0,0)), (708, low_num_lines))
+                screen.blit(h4.render("Error: Line Too Long", True, (255,255,255)), (708, low_num_lines))
 
 
     #for each of the options, check how many lines they need and display as needed
@@ -580,6 +585,17 @@ def textScreen():
     end_angle = 2 * math.pi * percentage
     pygame.draw.arc(window, (100, 100, 100), pygame.Rect(854, 200, 64, 64), 0, end_angle, 4)
 
+    #show the prompt for the user to use the pressure sensor
+    if arduino_countdown > 0:
+        global dotcount
+        if dotcount == 1:
+            dots = "."
+        elif dotcount == 2:
+            dots = ".."
+        else:
+            dots = "..."
+        screen.blit(currScreen.prompt.convert(), (56,570))
+        screen.blit(prompt_font.render(dots, True, (255,255,255)), (200, 547))
 
     #nested method for retrieving messages from grammar sets/Gemini API
     def get_messages():
@@ -748,6 +764,13 @@ def textScreen():
             if countingdown:
                 if arduino_countdown > 0:
                     arduino_countdown -= 1
+
+                    #update prompt animation
+                    if dotcount < 3:
+                        dotcount+=1
+                    else:
+                        dotcount = 1
+
                     if arduino_countdown < 3:
                         global countdown_tick
                         pygame.mixer.Sound.play(countdown_tick)
