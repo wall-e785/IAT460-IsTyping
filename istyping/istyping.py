@@ -84,6 +84,25 @@ resized_screen = pygame.transform.scale(screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
 window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 window.blit(resized_screen, (0,0))
 
+# create an instance for Arduino Board
+analogPrinter = Arduino.AnalogPrinter()
+analogPrinter.start()
+
+#setting up timer referenced from: https://gamedevacademy.org/pygame-timer-tutorial-complete-guide/
+TIMEREVENT = pygame.USEREVENT +1
+pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
+
+COUNTDOWN = 9
+#time to countdown from for choosing pressure to respond with
+arduino_countdown = COUNTDOWN
+countingdown = False
+
+#timer to keep the chosen responses on screen for a few seconds before next message
+DISPLAY_COUNTDOWN = 2
+display_countdown = DISPLAY_COUNTDOWN
+display_countingdown = False
+display_selected = None
+
 #button class, creates a button which has a visual component (rectangle) and text on top of it
 #reviewed python classes from: https://www.w3schools.com/python/python_classes.asp
 class Button:
@@ -177,28 +196,16 @@ class Fader:
         else:
             #fade in until 0 by decreasing alpha
             self.alpha -= 5
-            if self.alpha <= 0:
+            if self.alpha <= 0 and self.fading != None:
                 self.fading = None  
-
-  
-# create an instance for Arduino Board
-analogPrinter = Arduino.AnalogPrinter()
-analogPrinter.start()
-
-#setting up timer referenced from: https://gamedevacademy.org/pygame-timer-tutorial-complete-guide/
-TIMEREVENT = pygame.USEREVENT +1
-pygame.time.set_timer(TIMEREVENT, 1000) #timerevent is called every 1 second
-
-COUNTDOWN = 9
-#time to countdown from for choosing pressure to respond with
-arduino_countdown = COUNTDOWN
-countingdown = False
-
-#timer to keep the chosen responses on screen for a few seconds before next message
-DISPLAY_COUNTDOWN = 2
-display_countdown = DISPLAY_COUNTDOWN
-display_countingdown = False
-display_selected = None
+                if state == DATE or state == BOSS:
+                    #reset countdowns for the start of the character (so it's uninterrupted by fade in)
+                    global arduino_countdown, display_countdown, display_countingdown, display_selected
+                    arduino_countdown = COUNTDOWN 
+                    countingdown = True
+                    display_countingdown = False
+                    display_countdown = DISPLAY_COUNTDOWN
+                    display_selected = None
 
 #homescreen class: holds UI for homescreen
 class HomeScreen:
@@ -304,7 +311,7 @@ class EndScreen:
 #creditscreen class: holds UI for credit sscreen to show credits
 class CreditScreen:
     def __init__(self):
-        self.homeButton = Button(547, 545, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
+        self.homeButton = Button(28, 18, 224, 62,  pygame.image.load("istyping/images/home_button.png"))
         self.bg = pygame.image.load("istyping/images/credits.jpg")
 
 #transitionscreen class: holds UI for transitions between the characters to introduce them
@@ -622,7 +629,6 @@ def textScreen():
                 # else:    
                 #     currScreen.currMessage = grammar.generate('S-LOW', friend.friend_grammar4)
             else:
-                pygame.time.delay(3000)
                 message_counter = 1
                 if fader.fading == None:
                     fader.next()
@@ -665,7 +671,6 @@ def textScreen():
                     currScreen.currMessage = grammar.generate('S-UNINTERESTED', date.date_grammar3)
                 pygame.mixer.Sound.play(receive_sound)
             else:
-                pygame.time.delay(3000)
                 message_counter = 1
                 if fader.fading == None:
                     fader.next()
@@ -727,7 +732,6 @@ def textScreen():
                         currScreen.currMessage = grammar.generate('S-CASUAL', boss.boss_grammar5)
                 pygame.mixer.Sound.play(receive_sound)
             else:
-                pygame.time.delay(3000)
                 message_counter = 1
                 if fader.fading == None:
                     fader.next()
@@ -784,15 +788,21 @@ def textScreen():
                     elif display_countingdown and display_countdown > 0:
                         display_countdown -=1 #show the selected message for a few seconds
                     else:
-                        arduino_countdown = COUNTDOWN 
-                        countingdown = False
-                        display_countingdown = False
-                        display_countdown = DISPLAY_COUNTDOWN
-                        display_selected = None
-
-                        if state == FRIEND or state == DATE or state == BOSS:
-                            if fader.fading == None:
-                                get_messages()
+                        #only reset the countdown variables if it's not the last message for the character
+                        if ((state == FRIEND or state == DATE) and message_counter < 4) or (state == BOSS and message_counter < 5):
+                            arduino_countdown = COUNTDOWN 
+                            countingdown = False
+                            display_countingdown = False
+                            display_countdown = DISPLAY_COUNTDOWN
+                            display_selected = None
+                            
+                        if fader.fading == None:
+                            if state == FRIEND or state == DATE:
+                                if message_counter <= 4:
+                                    get_messages()
+                            elif state == BOSS:
+                                if message_counter <= 5:
+                                    get_messages()
                         print(selected)  
 
 #tutorial screen loop - displays the tutorial + buttons
@@ -914,7 +924,7 @@ def transitionLoop():
         else:
             showName = False
             done = True   
-            screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
+        screen.blit(transition_font.render(currScreen.name, True, (0,0,0)), (name_pos, 281))
 
     #resetting variables once the countdown is over
     if stay_on_screen == 0:
