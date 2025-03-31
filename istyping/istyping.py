@@ -818,8 +818,9 @@ def textScreen():
                             display_countingdown = False
                             display_countdown = DISPLAY_COUNTDOWN
                             display_selected = None
-                            
-                        if fader.fading == None:
+                        
+                        global fader
+                        if fader.fading != 'OUT':
                             if state == FRIEND or state == DATE:
                                 if message_counter <= 4:
                                     get_messages()
@@ -873,12 +874,12 @@ def endScreen():
     homeButton.draw()
 
     #write each of the preferences + user's performance in simple language
-    screen.blit(h3.render("The friend...", True, (0,0,0)), (279, 310))
-    screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (410, 310))
-    screen.blit(h3.render("The date...", True, (0,0,0)), (279, 345))
-    screen.blit(h5.render(preferences.get_date() + ", they liked the tone of " + preferences.get_date_score() + " of your messages", True, (0,0,0)), (400, 345))
-    screen.blit(h3.render("The boss...", True, (0,0,0)), (279, 380))
-    screen.blit(h5.render(preferences.get_boss() + ", they liked the tone of " + preferences.get_boss_score() + " of your messages", True, (0,0,0)), (400, 380))
+    screen.blit(h3.render("The friend...", True, (0,0,0)), (260, 310))
+    screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (493, 310))
+    screen.blit(h3.render("The date...", True, (0,0,0)), (260, 345))
+    screen.blit(h5.render(preferences.get_date() + ", they liked the tone of " + preferences.get_date_score() + " of your messages", True, (0,0,0)), (383, 345))
+    screen.blit(h3.render("The boss...", True, (0,0,0)), (260, 380))
+    screen.blit(h5.render(preferences.get_boss() + ", they liked the tone of " + preferences.get_boss_score() + " of your messages", True, (0,0,0)), (383, 380))
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #exit button
             global run

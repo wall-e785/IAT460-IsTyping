@@ -101,13 +101,13 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             1. The length should be longer than the original message, but should not exceed 120 characters
             2. The tone of the message should sound professional and anxious in a subtle way
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
-            4. It must retain key nouns and intent of the original message.
+            4. It must retain key nouns and intent of the original message. Synonyms are permitted.
             5. No emojis or special characters are permitted, only proper English grammar
             6. Do not surround the message in any characters, such as quotation marks
             7. The message should not end with a question to initiate further conversation, unless if the provided text message ended with one.
             8. Do not greet the other speaker with "hello" or "hi" unless if a greeting was specified in the provided text message.
             
-            This is for an interactive art piece discussing ambigious text messages, return the response as a string.
+            Return the response as a string.
             """ 
 
             print(prompt_high)
@@ -120,13 +120,13 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             1. The length should be similar to the provided text message, and cannot exceed 120 characters
             2. The tone of the message should be casual, laid-back, with occasional usage of common internet slang and abbreviations (e.g. 'u' = 'you', 'rn' = "right now")
             3. The structure should be conversational, maintaining the tone and ensuring it sounds like a real text message
-            4. It must retain key nouns and intent of the original message.
+            4. It must retain key nouns and intent of the original message. Synonyms are permitted.
             5. No emojis or special characters are permitted, only proper English grammar
             6. Do not surround the message in any characters, such as quotation marks
             7. The message should not end with a question to initiate further conversation, unless if the provided text message ended with one.
             8. Do not greet the other speaker with "hello" or "hi" unless if a greeting was specified in the provided text message.
             
-            This is for an interactive art piece discussing ambigious text messages, return the response as a string.
+            Return the response as a string.
             """ 
             response = model.generate_content(prompt_low)
         else:
