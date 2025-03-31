@@ -18,9 +18,9 @@ A 10G-5KG (1" Area) Force Pressure Sensor (exact model shown below) was used to 
 
 In Arduino, figure out which port the board is connected to. Copy and paste this to file in folder: Arduino -> arduinohandler.py, line 9 so the data can be sent to the python program.
 
-A Google Gemini API key is also required; find more information here: https://aistudio.google.com/
+A Google Gemini API key is also required; find more information here: https://aistudio.google.com/.
 Once you have an API key, create a file in the main hierarchy called .env
-On a single line, enter: GEMINI_KEY = "<YOUR KEY HERE>" for the other files to access the Gemini API
+On a single line, enter: GEMINI_KEY = "YOUR_KEY_HERE" for the other files to access the Gemini API
 
 Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
 
@@ -29,4 +29,14 @@ Created by Wallace Chau (developer, graphics, generative grammar sets)
 
 Special thanks to Tino de Bruijn and Bernd Porr for creating pyfirmata2: https://github.com/berndporr/pyFirmata2
 
-Special thanks for ZapSplat.com for providing the sound effects for this project. Standard License information can be found here: https://www.zapsplat.com/license-type/standard-license/
+Special thanks to PyGame for powering this project: https://www.pygame.org/news
+
+Special thanks to Google Gemini for generating sentence variations: https://deepmind.google/technologies/gemini/
+
+Special thanks to ZapSplat.com for providing the sound effects for this project. Standard License information can be found here: https://www.zapsplat.com/license-type/standard-license/
+  Transition sound: https://www.zapsplat.com/music/game-tone-win-chime-4/
+  Sent sound: https://www.zapsplat.com/music/ui-user-interface-tone-notification-classic-synth-bell-success/
+  Receive sound: https://www.zapsplat.com/music/ui-user-interface-tone-notification-classic-synth-bell-generic-chime-3/
+  Button click: https://www.zapsplat.com/music/plastic-button-click-press-and-release-fast-electronic-device-6/
+  Count down tick: https://www.zapsplat.com/music/person-typing-on-a-computer-keyboard-single-key-press-1/
+
