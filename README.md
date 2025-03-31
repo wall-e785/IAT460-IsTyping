@@ -18,9 +18,9 @@ A 10G-5KG (1" Area) Force Pressure Sensor (exact model shown below) was used to 
 
 In Arduino, figure out which port the board is connected to. Copy and paste this to file in folder: Arduino -> arduinohandler.py, line 9 so the data can be sent to the python program.
 
-A Google Gemini API key is also required; find more information here: https://aistudio.google.com/
+A Google Gemini API key is also required; find more information here: https://aistudio.google.com/.
 Once you have an API key, create a file in the main hierarchy called .env
-On a single line, enter: GEMINI_KEY = "<YOUR KEY HERE>" for the other files to access the Gemini API
+On a single line, enter: GEMINI_KEY = "YOUR_KEY_HERE" for the other files to access the Gemini API
 
 Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
 
