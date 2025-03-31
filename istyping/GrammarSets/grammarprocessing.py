@@ -96,7 +96,7 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
         if prompt == 'HIGH':
             prompt_high = "Your " + other_speaker + " has texted you stating: " + received_text + """
 
-            Generate a variation of this provided text message: """ + provided_text + """
+            Generate a variation of this provided text message to respond with: """ + provided_text + """
             which meets the following criteria:
             1. The length should be longer than the original message, but should not exceed 120 characters
             2. The tone of the message should sound professional and anxious in a subtle way
@@ -109,11 +109,13 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             
             This is for an interactive art piece discussing ambigious text messages, return the response as a string.
             """ 
+
+            print(prompt_high)
             response = model.generate_content(prompt_high)
         elif prompt == 'LOW': #generates the provided text in a more lowkey tone
             prompt_low = "Your " + other_speaker + " has texted you stating: " + received_text + """
 
-            Generate a variation of this provided text message: """ + provided_text + """
+            Generate a variation of this provided text message to respond with: """ + provided_text + """
             which meets the following criteria:
             1. The length should be similar to the provided text message, and cannot exceed 120 characters
             2. The tone of the message should be casual, laid-back, with occasional usage of common internet slang and abbreviations (e.g. 'u' = 'you', 'rn' = "right now")
