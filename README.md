@@ -22,7 +22,7 @@ A Google Gemini API key is also required; find more information here: https://ai
 Once you have an API key, create a file in the main hierarchy called .env
 On a single line, enter: GEMINI_KEY = "YOUR_KEY_HERE" for the other files to access the Gemini API
 
-Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. 
+Once all the setup steps are complete, you are ready to run the program. Run the istyping.py file using your created virtual environment. A PyGame window will appear; interact with it using mouse clicks and pressure sensor as prompted.
 
 # Credits:
 Created by Wallace Chau (developer, graphics, generative grammar sets)
