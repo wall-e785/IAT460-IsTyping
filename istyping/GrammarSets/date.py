@@ -29,7 +29,7 @@ date_grammar1 = {
 
 you_grammar2 = {
     #non-terminal symbols
-    'S': [['I', 'so I can', 'SCHEDULE', 'the rest of my', 'TIME'], ['PREFER', 'tell me now becuase i\'m', 'SCHEDULING', 'my', 'TIME']],
+    'S': [['I', 'so I can', 'SCHEDULE', 'the rest of my', 'TIME'], ['PREFER', 'tell me now because i\'m', 'SCHEDULING', 'my', 'TIME']],
     
     #terminal symbols
     'I': ['I just really need to know', 'Can you let me know now'],

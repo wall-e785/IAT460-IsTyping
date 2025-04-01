@@ -875,7 +875,7 @@ def endScreen():
 
     #write each of the preferences + user's performance in simple language
     screen.blit(h3.render("The friend...", True, (0,0,0)), (260, 310))
-    screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (493, 310))
+    screen.blit(h5.render(preferences.get_friend() + ", they liked the tone of " + preferences.get_friend_score() + " of your messages", True, (0,0,0)), (393, 310))
     screen.blit(h3.render("The date...", True, (0,0,0)), (260, 345))
     screen.blit(h5.render(preferences.get_date() + ", they liked the tone of " + preferences.get_date_score() + " of your messages", True, (0,0,0)), (383, 345))
     screen.blit(h3.render("The boss...", True, (0,0,0)), (260, 380))

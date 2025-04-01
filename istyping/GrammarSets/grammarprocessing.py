@@ -110,7 +110,6 @@ def get_prompt(received_text, provided_text, other_speaker, prompt):
             Return the response as a string.
             """ 
 
-            print(prompt_high)
             response = model.generate_content(prompt_high)
         elif prompt == 'LOW': #generates the provided text in a more lowkey tone
             prompt_low = "Your " + other_speaker + " has texted you stating: " + received_text + """
