@@ -465,7 +465,7 @@ def textScreen():
                 low_num_lines = LOW_2LINES_Y
                 screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
                 screen.blit(h4.render(formatted_selected[1], True, (255,255,255)), (708, low_num_lines+24))
-            elif len(formattedLow) == 1: #1 line
+            elif len(formatted_selected) == 1: #1 line
                 low_num_lines = LOW_1LINE_Y
                 screen.blit(h4.render(formatted_selected[0], True, (255,255,255)), (708, low_num_lines))
             else:
