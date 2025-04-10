@@ -2,12 +2,19 @@
 is-typing is an interactive art piece, highlighting the idea of ambiguity in text-based communication. Users have conversations with three individuals, each preferring an unknown "tone" of message to the user. Users must select what they believe is the most appropriate response using a physical pressure sensor, translating it into text emotion. This project uses generative grammar rulesets to create dialogue, as well as the Google Gemini API to expand these sets.
 
 The structure of the project is:
-\n-Introduction/Tutorial (how to interact with the system)
+
+-Introduction/Tutorial (how to interact with the system)
+
 -Texting a Friend (choose one of three possible responses for each message)
+
 -Texting a Date (choose one of three possible responses for each message)
+
 -Texting a Boss (choose one of three possible responses for each message)
+
 -Concluding text from Friend (completing the narrative)
+
 -Summary (user's performance relative to character's preferred texting style)
+
 
 This project was created for SFU IAT 460 - Generative AI and Computational Creativity
 
